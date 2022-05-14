@@ -246,8 +246,14 @@ const dragonCurveAlphabet = {
   },
 };
 
-function draw(s, t, a) {
-  let stack = [];
+function draw(s: string, t: Turtle, a: IAlphabet) {
+  interface StackFrame {
+    x: number;
+    y: number;
+    facing: string;
+    color: Color;
+  }
+  let stack:StackFrame[];
   let va = a.variables;
   let cn = a.constants;
   let pr = a.probs;
@@ -297,6 +303,7 @@ function draw(s, t, a) {
     },
   };
 
+  stack = [];
   for (let i = 0; i <= s.length; i++) {
     let c = s[i];
     if (pr != undefined && pr[c] != undefined) {
@@ -312,12 +319,12 @@ function draw(s, t, a) {
         //        t.color = {r:0,g:127,b:0,a:1};
       } else if (c === "]") {
         let o = stack.pop();
-        // console.log(o.color["r"] - t.color["r"]);
-        t.x = o.x;
-        t.y = o.y;
-        t.facing = o.facing;
-        t.color = o.color;
-        //       t.color = {r:0,g:155,b:0,a:1};
+        if (o !== undefined) {
+          t.x = o.x;
+          t.y = o.y;
+          t.facing = o.facing;
+          t.color = o.color;
+        }
       }
       for (let i = 0; i < cn[c].length; i++) {
         let [verb, arg] = cn[c][i];
@@ -519,9 +526,6 @@ function alphabetReducer(state: AlphabetState, action: AllAction) {
 //turtle.x = 63;
 //turtle.y = 63;
 //applyRules("B", compute, 4);
-function renderVariables(variables) {
-  console.log(ruleNames, rewrite, drawRules);
-}
 
 function Name(props) {
   return (
