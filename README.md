@@ -10,7 +10,7 @@ I have a lot of ideas for the future of this project and I'm excited to implemen
 - Maybe some fun with genetics in the future?
 
 ## Special Thanks
-- [Chuck Dries](https://github.com/chuckdries)
+- [Chuck Dries](https://github.com/chuckdries) for holding my hand through the React bits.
 - StackOverflow, for obvious reasons.
 - [The L-system Wikipedia page](https://en.wikipedia.org/wiki/L-system).
 - [*The Algorithmic Beauty of Plants*](https://archive.org/details/the-algorithmic-beauty-of-plants)
