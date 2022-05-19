@@ -1,6 +1,8 @@
 import React, { ReactNode } from "react";
 import ReactDOM from "react-dom/client";
-import { Turtle, Color, clamp } from "./Turtle";
+import { Turtle } from "./Turtle";
+import { fernAlphabet, exampleAlphabet, binaryTreeAlphabet, probAlphabet, dragonCurveAlphabet, prodAlphabet,
+         IAlphabet, VariableProperties, DrawCommandTuples, ProbTuple, applyRules, computeSentence} from "./Lsystems"
 import "./App.css";
 
 //@ts-ignore
@@ -39,419 +41,8 @@ interface CanvasProps {
   state: ReducerState;
 }
 
-function applyRules(t, sentence, fn, n, alphabet) {
-  let end = sentence;
-  for (var i = 1; i <= n; i++) {
-    //console.log(end);
-    end = fn(end, alphabet);
-    if (i == n) {
-      draw(end, t, alphabet);
-    }
-  }
-  return end;
-}
 
-type CommandTuple = [string, number] | ["nop"];
-
-type DrawCommandTuples = CommandTuple[];
-
-type VariableProperties = [string, DrawCommandTuples];
-
-type Variable = { [name: string]: VariableProperties };
-
-type Constant = { [name: string]: DrawCommandTuples };
-
-type ProbTuple = [string, number];
-
-type Prob = { [name: string]: ProbTuple[] };
-
-interface IAlphabet {
-  name: string;
-  atomic: string;
-  variables: Variable;
-  constants: Constant;
-  probs?: Prob;
-}
-
-const exampleAlphabet: IAlphabet = {
-  // Fields: name, atomic, variables, constants, probs
-  name: "Example/Documentation Alphabet",
-
-  // Starting sentence.
-  atomic: "B",
-
-  // The keys of the following data structures should be single characters and are read by computeSentence(); recursively.
-  //
-  // variables: Characters that are re-written by the string in [0]. The rewrite string should only contain characters defined in variables, constants, or probs
-  //   The array (value[1]) of arrays correspond to turtle commands run by draw()
-  //   see draw() for documentation on DSL.
-  variables: {
-    C: ["CC", [["fwd", 2]]],
-    B: [
-      "CB",
-      [
-        ["fwd", 2],
-        ["tcw", 2],
-        ["fwd", 1],
-      ],
-    ],
-  },
-
-  // constants: Like variables, but do not get re-written. Draw commands belong in the same form as in variables.
-  //  Special constants:
-  //    [ : pushes turtle position, orientation, and color to a stack during draw();
-  //    ] : pops the stack, returning above values to where they were before.
-  //    There is no validation for balancing the brackets. Expect undefined weirdness for unbalanced brackets.
-  constants: { "[": [["tcw", 2]], "]": [["tcc", 2]] },
-
-  // probs: Like variables, but no draw commands, and the rewrite rules are chosen by chances in values[n][1] (eg, 0.5 = 50% chance)
-  // todo: add default for p<1.0
-  probs: {
-    b: [
-      ["C[b]", 0.5],
-      ["b[C]", 0.5],
-    ],
-  },
-};
-
-const binaryTreeAlphabet: IAlphabet = {
-  name: "Binary Tree",
-  atomic: "B",
-  //variables: process rule [0], drawing commands and parameters in [1]
-  variables: { A: ["AA", [["fwd", 2]]], B: ["A[B]B", [["fwd", 2]]] },
-  //constants: draw commands, params (no re-write rules).
-  constants: { "[": [["tcw", 2]], "]": [["tcc", 2]] },
-};
-
-const probAlphabet: IAlphabet = {
-  name: "Prob",
-  atomic: "y",
-  variables: {
-    F: ["F", [["fwd", 1]]],
-    //"X": ["FF[VF[FFYFF[Q]]]", [["fwd", 1]]],
-    X: ["XF[++XIF]X[F[--Fq]]", [["fwd", 1]]],
-    B: ["F[v[[F]FX]vX[[Fq]]]", [["fwd", 1]]],
-    I: ["[vXFvB]", [["nop"]]],
-    U: ["U", [["tup", 1]]],
-    T: ["", [["tnt", 0.01]]],
-    S: ["", [["shd", 0.01]]],
-  },
-  constants: {
-    "[": [["nop"]],
-    "]": [["nop"]],
-    R: [
-      ["cr+", 25],
-      ["cg-", 25],
-    ],
-    D: [["cr+", 25]],
-    "+": [["tcc", 1]],
-    "-": [["tcw", 1]],
-  },
-  probs: {
-    y: [
-      ["FF[XvTDTT[vFB]]", 0.5],
-      ["FF[XvSDSS[vFB]]", 0.5],
-    ],
-    c: [
-      ["TTTT", 0.5],
-      ["SSSS", 0.5],
-    ],
-    v: [
-      ["-", 0.5],
-      ["+", 0.5],
-    ],
-    q: [
-      ["FFFU+++RRRRRccc[F----F----F----F----F----F]", 0.1],
-      ["y", 0.9],
-    ],
-  },
-};
-
-const fernAlphabet = {
-  //variables: process rule [0], drawing commands and parameters in [1]
-  name: "Fern (var. 3)",
-  variables: {
-    F: ["FF", [["fwd", 1]]],
-    //'X': ["F+[[X]-X]-F[-FX]+X",
-    //'X': ["F+[[X]+X]-F[-FX]-X+[X]",
-    //              'X': ["XF+[X[+X]F]-X[X[-X]-FX[+FX]]",
-    Y: ["XY", [["fwd", 2]]],
-    X: ["XF+[X[+XF]]-X[X[-XY]-FX[+FX]]", [["nop"]]],
-  },
-  //constants: draw commands, params (no re-write rules).
-  constants: {
-    "[": [["nop"]],
-    "]": [["nop"]],
-    "+": [["tcw", 1]],
-    "-": [["tcc", 1]],
-  },
-};
-
-const prodAlphabet = {
-  //variables: process rule [0], drawing commands and parameters in [1]
-  name: "Fern (var. 4)",
-  atomic: "Yv",
-  variables: {
-    F: ["FF", [["fwd", 1]]],
-    //'X': ["F+[[X]-X]-F[-FX]+X",
-    //'X': ["F+[[X]+X]-F[-FX]-X+[X]",
-    //              'X': ["XF+[X[+X]F]-X[X[-X]-FX[+FX]]",
-    Y: ["XY", [["fwd", 2]]],
-    U: ["", [["tup", 2]]],
-    X: ["XF+[X[+XF]]-X[X[vXY]-FX[vFXq]]", [["nop"]]],
-  },
-  //constants: draw commands, params (no re-write rules).
-  constants: {
-    "[": [["nop"]],
-    "]": [["nop"]],
-    R: [
-      ["cr+", 25],
-      ["cg-", 25],
-    ],
-    D: [["cr+", 25]],
-    T: [["tnt", 0.01]],
-    S: [["shd", 0.01]],
-    "+": [["tcw", 1]],
-    "-": [["tcc", 1]],
-  },
-  probs: {
-    y: [
-      ["FF[TDDTT[vF]]", 0.5],
-      ["FF[SDDSS[vF]]", 0.5],
-    ],
-    v: [
-      ["+", 0.5],
-      ["-", 0.5],
-    ],
-    c: [
-      ["TTTT", 0.5],
-      ["SSSS", 0.5],
-    ],
-    q: [
-      ["FFFU+++RRRRRcccc[F----F----F----F----F----F]", 0.1],
-      ["y", 0.9],
-    ],
-  }
-
-};
-const dragonCurveAlphabet = {
-  name: "Dragon Curve",
-  variables: { F: ["F+G", [["fwd", 2]]], G: ["F-G", [["fwd", 2]]] },
-  //constants: draw commands, params (no re-write rules).
-  constants: {
-    "[": [["nop"]],
-    "]": [["nop"]],
-    "+": [["tcw", 4]],
-    "-": [["tcc", 4]],
-  },
-};
-
-function draw(s: string, t: Turtle, a: IAlphabet) {
-  interface StackFrame {
-    x: number;
-    y: number;
-    facing: string;
-    color: Color;
-  }
-  let stack:StackFrame[];
-  let va = a.variables;
-  let cn = a.constants;
-  let pr = a.probs;
-  //console.log(a.name);
-
-  let verbs = {
-    fwd: (steps) => {
-      t.moveForward(steps);
-    },
-    tcw: (amount) => {
-      t.turn("R", amount);
-    },
-    tcc: (amount) => {
-      t.turn("L", amount);
-    },
-    tup: (steps) => {
-      t.facing = "N";
-      t.moveForward(steps);
-    },
-    // c[rgb][+-](n): increases/decreases turtle red, green, blue by n.
-    "cr+": (amount) => {
-      t.color["r"] += clamp(amount, 0, 255);
-    },
-    "cr-": (amount) => {
-      t.color["r"] -= clamp(amount, 0, 255);
-    },
-    "cg+": (amount) => {
-      t.color["g"] += clamp(amount, 0, 255);
-    },
-    "cg-": (amount) => {
-      t.color["g"] -= clamp(amount, 0, 255);
-    },
-    "cb+": (amount) => {
-      t.color["b"] += clamp(amount, 0, 255);
-    },
-    "cb-": (amount) => {
-      t.color["b"] -= clamp(amount, 0, 255);
-    },
-    tnt: (amount) => {
-      t.tint(amount);
-    },
-    shd: (amount) => {
-      t.shade(amount);
-    },
-    nop: () => {
-      t.nop();
-    },
-  };
-
-  stack = [];
-  for (let i = 0; i <= s.length; i++) {
-    let c = s[i];
-    if (pr != undefined && pr[c] != undefined) {
-      verbs["nop"]();
-    } else if (cn[c] != undefined) {
-      if (c === "[") {
-        stack.push({
-          x: t.x,
-          y: t.y,
-          facing: t.facing,
-          color: Object.assign({}, t.color),
-        });
-        //        t.color = {r:0,g:127,b:0,a:1};
-      } else if (c === "]") {
-        let o = stack.pop();
-        if (o !== undefined) {
-          t.x = o.x;
-          t.y = o.y;
-          t.facing = o.facing;
-          t.color = o.color;
-        }
-      }
-      for (let i = 0; i < cn[c].length; i++) {
-        let [verb, arg] = cn[c][i];
-        verbs[verb](arg);
-      }
-    } else if (va[c] != undefined) {
-//      console.log(280, va[c])
-      for (let i = 0; i < va[c][1].length; i++) {
-        let [verb, arg] = va[c][1][i];
-        verbs[verb](arg);
-      }
-    } else {
-      break;
-    }
-  }
-}
-
-function weighted_random(items, weights) {
-  // https://stackoverflow.com/questions/43566019/how-to-choose-a-weighted-random-array-element-in-javascript
-  var i;
-
-  for (i = 0; i < weights.length; i++) weights[i] += weights[i - 1] || 0;
-
-  var random = Math.random() * weights[weights.length - 1];
-
-  for (i = 0; i < weights.length; i++) if (weights[i] > random) break;
-
-  return items[i];
-}
-
-function computeSentence(s, a) {
-  let end = "";
-  let va = a.variables;
-  let cn = a.constants;
-  let pr = a.probs;
-
-  for (let i = 0; i < s.length; i++) {
-    let c = s[i];
-    //  console.log(c)
-    if (va[c] != undefined) {
-      end += va[c][0];
-    } else if (cn[c] != undefined) {
-      end += c;
-    } else if (pr != undefined && pr[c] != undefined) {
-      let items = [];
-      let probs = [];
-
-      for (let j = 0; j < pr[c].length; j++) {
-        items = items.concat(pr[c][j][0]);
-        probs = probs.concat(pr[c][j][1]);
-      }
-      //  console.log(items);
-      end += weighted_random(items, probs);
-    } else {
-      end += "";
-    }
-  }
-  return end;
-}
-
-function compute() {
-  //  let end = "";
-  //  let stack = [];
-  //  turtle.facing = "N";
-  //  for(var i = 0; i <= s.length; i++) {
-  //    let c = s[i];
-  //
-  //    if(c === 'A') {
-  //      turtle.moveForward(2)
-  //      end = end.concat('AA');
-  //    }
-  //    else if (c === 'B') {
-  //      turtle.moveForward(2);
-  //      end = end.concat('A[B]B');
-  //    }
-  //    else if (c === 'C') {
-  //      turtle.moveForward(1);
-  //      turtle.color = rgba(0,128,0,1)
-  //      end = end.concat('BX')
-  //    }
-  //    else if (c === "X") {
-  //      turtle.goto(15,33);
-  //      end = end.concat('[AB]')
-  //    }
-  //    else if (c === "[") {
-  //      stack.push({x: turtle.x, y: turtle.y, facing: turtle.facing});
-  //      turtle.turn("L",1);
-  //      end += "["
-  //    }
-  //    else if (c === "]") {
-  //      let o = stack.pop();
-  //      turtle.x = o.x;
-  //      turtle.y = o.y;
-  //      turtle.facing = o.facing;
-  //
-  //      turtle.turn("R",1);
-  //      end += "]"
-  //    }
-  //  }
-  //  return end;
-}
-
-//const canvas: HTMLCanvasElement = document.getElementById('canvas');
-//const ctx = canvas.getContext('2d');
-const start_y = 256;
-const start_x = start_y;
-//const turtle = new Turtle(start_x,start_y,{r:90,g:194,b:93,a:0.6});
-//turtle.facing = "N";
-//applyRules(turtle, "B", computeSentence, 7, binaryTreeAlphabet);
-//applyRules(turtle, "F", computeSentence, 13, dragonCurveAlphabet);
-//applyRules(turtle, "X", computeSentence, 5, fernAlphabet);
-//applyRules(turtle, "Y", computeSentence, 5, probAlphabet);
-function drawMany(n, turtle, applyFn, compFn, iters, alphabet) {
-  turtle.x -= 128 * n;
-  for (let i = 1; i <= n; i++) {
-    let cGreen = { r: 90, g: 194, b: 93, a: 0.6 };
-    //   console.log("drawn ", i);
-    turtle.facing = "N";
-    turtle.x += 52 * n + iters * n;
-    turtle.y = start_y;
-    turtle.color = cGreen;
-    //    turtle.shade(0.01)
-    applyFn(turtle, alphabet.atomic, compFn, iters, alphabet);
-  }
-}
-
-function initAlphabetState(alphabet) {
+function initAlphabetState(alphabet:IAlphabet) {
   return { alphabet: alphabet };
 }
 
@@ -459,14 +50,15 @@ interface AlphabetState {
   alphabet: IAlphabet;
 }
 
-interface Payload {
-  target: string;
-  contents: any;
+interface VarEl {
+  predecessor: string;
+  successor: string;
+  drawcmds: DrawCommandTuples;
 }
 
 interface variableAction {
   type: "variable";
-  payload: Payload;
+  payload: VarEl;
 }
 interface resetAction {
   type: "reset";
@@ -507,18 +99,21 @@ function alphabetReducer(state: AlphabetState, action: AllAction) {
   let na;
   switch(action.type) {
       case 'variable':
+        console.log(511,action.payload);
         na = {
           alphabet: {
             ...state.alphabet,
             variables: {
-              [action.payload.target]: [action.payload.contents]
+              ...state.alphabet.variables,
+              [action.payload.predecessor]: [action.payload.successor, action.payload.drawcmds]
             }
           }
         }
-        console.log(464,na);
         return na;
       case 'reset':
-        return initAlphabetState(state.alphabet);
+        na = initAlphabetState(state.alphabet);
+        console.log(526,na);
+        return na;
   }
 }
 
@@ -531,6 +126,14 @@ function Name(props) {
   return (
     <div>
       <h1>{props.alphabet.name}</h1>
+    </div>
+  );
+}
+
+function Axiom(props) {
+  return (
+    <div>
+      <p>{props.alphabet.axiom}</p>
     </div>
   );
 }
@@ -570,6 +173,7 @@ function Controls({ state, dispatch }: ReducerProps) {
   return (
     <div>
       <Name alphabet={state.alphabet} />
+      <Axiom alphabet={state.alphabet} />
       <Variables state={state} dispatch={dispatch} />
       <Constants state={state} dispatch={dispatch}/>
       <Probs state={state} dispatch={dispatch} />
@@ -603,7 +207,7 @@ const Canvas = (props: CanvasProps) => {
       defaultColor,
       context
     );
-    applyRules(turtle, alphabet.atomic, computeSentence, props.iters, alphabet);
+    applyRules(turtle, alphabet.axiom, computeSentence, props.iters, alphabet);
   }, [props.iters, props.state.alphabet]);
 
   return (
@@ -640,10 +244,11 @@ function drawCmdsFromString(s: string) {
 function Variables({ state, dispatch }: ReducerProps) {
   const alphabet = state.alphabet;
   const populateFields = () => {
-    let a: { rule: string; rewrite: string; draw: DrawCommandTuples }[] = [];
+    let a:VarEl[] = [];
     let v = alphabet.variables;
     for (let r in v) {
-      let newfield = { rule: r, rewrite: v[r][0], draw: v[r][1] };
+      let vp:VariableProperties = v[r]
+      let newfield:VarEl = {predecessor: r, successor: vp[0], drawcmds: vp[1]}
       a = [...a, newfield];
     }
     return a;
@@ -651,23 +256,29 @@ function Variables({ state, dispatch }: ReducerProps) {
 
   const [inputFields, setInputFields] = React.useState([...populateFields()]);
 
-  const handleFormChange = (index, event) => {
+  const handleFormChange = (index: number, event) => {
     let data = [...inputFields];
+    console.log(261,event.target.value)
+//    console.log(668, data[index]);
     data[index][event.target.name] = event.target.value;
+    dispatch({type: "variable", payload: {...data[index],
+                                          [event.target.name]: event.target.value}}
+    );
     setInputFields(data);
   };
 
   const addFields = () => {
-    let newfield = { rule: "", rewrite: "", draw: [] };
+    let newfield:VarEl= {predecessor: "", successor: "", drawcmds: []};
     setInputFields([...inputFields, newfield]);
   };
 
   const submit = (e) => {
     e.preventDefault();
-    for (let i of inputFields) {
+    dispatch({type: "reset"});
+    for (let variable of inputFields) {
       dispatch({
         type: "variable",
-        payload: { target: i["rule"], contents: [i["rewrite"], i["draw"]]},
+        payload: variable,
       });
     }
   };
@@ -678,30 +289,32 @@ function Variables({ state, dispatch }: ReducerProps) {
     <div className="Variables">
       <form onSubmit={submit}>
         <h2>Variables</h2>
-        {inputFields.map((input, index) => {
+        {inputFields.map((input:VarEl, index:number) => {
           return (
             <div key={index} className="varItems">
               <input
-                name="rule"
-                placeholder="Rule"
-                value={input.rule}
+                name="predecessor"
+                placeholder="Predecessor"
+                value={input.predecessor}
+                maxLength={1}
                 onChange={(event) => handleFormChange(index, event)}
               />
               <input
-                name="rewrite"
-                placeholder="Rewrite"
-                value={input.rewrite}
+                name="successor"
+                placeholder="Successor"
+                value={input.successor}
                 onChange={(event) => handleFormChange(index, event)}
               />
               <input
                 name="draw"
                 placeholder="Draw rule"
-                value={drawCmdsToString(input.draw)}
+                value={drawCmdsToString(input.drawcmds)}
                 onChange={(event) => handleFormChange(index, event)}
               />
             </div>
           );
         })}
+        <br /> <br />
         <button type="button" onClick={addFields}>
           Add more...
         </button>
@@ -712,12 +325,13 @@ function Variables({ state, dispatch }: ReducerProps) {
 }
 
 function Constants({ state, dispatch }: ReducerProps) {
+  type ConstEl = [string, DrawCommandTuples];
   const alphabet = state.alphabet;
   const populateFields = () => {
-    let a: { rule: string; draw: DrawCommandTuples }[] = [];
+    let a: ConstEl[] = [];
     let c = alphabet.constants;
     for (let r in c) {
-      let newfield = { rule: r, draw: c[r] };
+      let newfield:ConstEl = [r, c[r]]
       a = [...a, newfield];
     }
     return a;
@@ -740,7 +354,7 @@ function Constants({ state, dispatch }: ReducerProps) {
     console.log(alphabet);
   };
   const addFields = () => {
-    let newfield = { rule: "", rewrite: "", draw: [] };
+    let newfield:ConstEl = ["", []];
     setInputFields([...inputFields, newfield]);
   };
   return (
@@ -753,18 +367,19 @@ function Constants({ state, dispatch }: ReducerProps) {
               <input
                 name="rule"
                 placeholder="Rule"
-                value={input.rule}
+                value={input[0]}
                 onChange={(event) => handleFormChange(index, event)}
               />
               <input
                 name="draw"
                 placeholder="Draw rule"
-                value={drawCmdsToString(input.draw)}
+                value={drawCmdsToString(input[1])}
                 onChange={(event) => handleFormChange(index, event)}
               />
             </div>
           );
         })}
+        <br />
         <button type="button" onClick={addFields}>
           Add more...
         </button>
@@ -775,29 +390,28 @@ function Constants({ state, dispatch }: ReducerProps) {
 }
 
 function Probs({ state, dispatch }: ReducerProps) {
+  type ProbEl = [string, ProbTuple[]];
   const alphabet = state.alphabet;
   const populateFields = () => {
-    let a: { rule: string; branches: ProbTuple[]}[] = [];
+    let a:ProbEl[] = [];
     let p = alphabet.probs;
     for (let r in p) {
-      //console.log(p[r])
-      let newfield = { rule: r, branches: p[r]};
+      let newfield:ProbEl = [r, p[r]];
       a = [...a, newfield];
     }
     return a;
   };
   const handleFormChange = (index:number | [number, number], event) => {
     let data = [...inputFields];
-    console.log(event.target.name, event.target.value);
-    console.log(data);
     switch(event.target.name) {
         case 'branchRewrite':
-          console.log(716,index)
-          data[index[0]]["branches"][index[1]][0] = event.target.value;
-          setInputFields(data);
+          console.log(808,data[index[0]])
+//          data[index[0]][1][index[1]][0] = event.target.value;
+//          setInputFields(data);
         case 'rule':
-          data[index[0]][event.target.name] = event.target.value;
-          setInputFields(data);
+          console.log(812,Object.keys(data))
+//          data[index[0]][event.target.name] = event.target.value;
+//          setInputFields(data);
     }
   };
 
@@ -816,8 +430,7 @@ function Probs({ state, dispatch }: ReducerProps) {
     }
   };
   const addFields = () => {
-    let b:ProbTuple[] = [["A", 0.5]]
-    let newfield = { rule: "", branches: b};
+    let newfield = ["", [["", 0]]];
     setInputFields([...inputFields, newfield]);
   };
 
@@ -831,7 +444,7 @@ function Probs({ state, dispatch }: ReducerProps) {
         <div key={index} className="probBranch">
           <input
             name="branchRewrite"
-            placeholder="Branch Rewrite Rule"
+            placeholder="Branch Successor"
             value={input[0]}
             onChange={(event) => handleFormChange([idx, index], event)}
           />
@@ -839,6 +452,10 @@ function Probs({ state, dispatch }: ReducerProps) {
             name="branchProb"
             placeholder="Branch Probability"
             value={input[1]}
+            type="number"
+            min="0"
+            max="1"
+            step="0.001"
             onChange={(event) => handleFormChange([idx, index], event)}
           />
         </div>
@@ -855,12 +472,12 @@ function Probs({ state, dispatch }: ReducerProps) {
           return (
             <div key={index} className="probItems">
               <input
-                name="rule"
-                placeholder="Rule"
-                value={input.rule}
+                name="predecessor"
+                placeholder="Predecessor"
+                value={input[0]}
                 onChange={(event) => handleFormChange(index, event)}
               />
-              {branches(input.branches, index)}
+              {branches(input[1], index)}
               <button type="button" onClick={addFields}>
                 +
               </button>
@@ -877,6 +494,58 @@ function Probs({ state, dispatch }: ReducerProps) {
 
 }
 
+
+interface DrawSettings {
+  width: number;
+  height: number;
+  scale: number;
+  iters: number;
+  count: number;
+}
+
+function DrawControls({settings, setFn, dispatch}) {
+  let localSettings = {...settings}
+
+  const handleFormChange = (index, event) => {
+    console.log(508,event.target.value)
+   if(index > 1) {
+      dispatch({type: "reset"})
+      localSettings = {...localSettings, [event.target.name]: parseInt(event.target.value)};
+    } else {
+      localSettings = {...localSettings, [event.target.name]: parseInt(event.target.value)};
+    }
+      setFn({...settings, [event.target.name]: parseInt(event.target.value)})
+
+  //  console.log(509,setFn({...settings, [event.target.name]: settings[event.target.name]}));
+ //   console.log(510,settings)
+  }
+  const submit = (e) => {
+    e.preventDefault();
+  }
+
+  return(
+    <div className="drawControls">
+      <form onSubmit={submit}>
+        <h3>Draw Settings</h3>
+        {Object.keys(settings).map((input, index) => {
+          return(<div key={index} className="drawSettings">
+           {input}:
+           <input name={input}
+           placeholder={input}
+           type="number"
+           value={settings[input]}
+           onChange={(event) => handleFormChange(index, event)}
+           />
+          <br />
+          </div>);
+        })}
+      </form>
+
+  </div> );
+
+
+}
+
 function App() {
   //  const [currentAlphabet, setCurrentAlphabet] = React.useState(exampleAlphabet);
   const [state, dispatch] = React.useReducer(
@@ -884,16 +553,18 @@ function App() {
     prodAlphabet,
     initAlphabetState
   );
+  const [drawSettings, setDrawSettings] = React.useState({width: 150, height: 150, scale: 4, iters: 5, count: 1})
   console.log("render app");
   return (
     <ErrorBoundary>
       <div className="container">
-        <Canvas width={150} height={150} scale={4} iters={5} state={state} />
+        <DrawControls settings={drawSettings} setFn={setDrawSettings} dispatch={dispatch}/>
+        <Canvas width={drawSettings.width} height={drawSettings.height} scale={drawSettings.scale} iters={drawSettings.iters} state={state} />
+        <Controls state={state} dispatch={dispatch} />
       </div>
     </ErrorBoundary>
   );
 }
-        //<Controls state={state} dispatch={dispatch} />
 //for (let i = 0; i < data.length; i += 4) {
 //  let x = (i / 4) % imageData.width;
 //  let y = Math.floor((i / 4) / imageData.width);

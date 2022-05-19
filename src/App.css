@@ -1,9 +1,16 @@
 .container {
   display: inline-flex;
+  width: 75%;
 }
 
 .varItems {
   display: inline-flex;
+  flex-wrap: nowrap;
+}
+
+input[name="predecessor"] {
+  order: 0;
+  width: 0.7em;
 }
 
 canvas {
