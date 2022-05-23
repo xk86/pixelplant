@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import ReactDOM from "react-dom/client";
-import { Turtle, opDocs } from "./Turtle";
+import { Turtle, drawOps, opDocs } from "./Turtle";
 import { fernAlphabet, exampleAlphabet, binaryTreeAlphabet, probAlphabet, dragonCurveAlphabet, prodAlphabet,
          IAlphabet, VariableProperties, CommandTuple, DrawCommandTuples, ProbTuple, applyRules, computeSentence} from "./Lsystems"
 import "./App.css";
@@ -156,9 +156,30 @@ function alphabetReducer(state: AlphabetState, action: AllAction) {
 //applyRules("B", compute, 4);
 
 function Name(props) {
+  let t = {...props.alphabet}.name
+  let [inputText, setInputText] = React.useState(t)
+  console.log(inputText)
+
+  const handleChange = (event) => {
+    event.preventDefault();
+    console.log(event.target.value)
+    setInputText(event.target.value)
+    props.dispatch({type: 'name', payload: {name: inputText}})
+  }
+  const submit = (e) => {
+    e.preventDefault();
+    props.dispatch({
+        type: "name",
+        payload: {name: inputText},
+      });
+    props.dispatch({type: "reset", payload: {alphabet: props.alphabet}});
+    }
+
   return (
     <div>
-      <h1>{props.alphabet.name}</h1>
+      <h1>{inputText}</h1>
+      <h2>{props.alphabet.name}</h2>
+      <form onSubmit={submit}><input type="text" value={inputText} onChange={(e)=>handleChange(e)}></input></form>
     </div>
   );
 }
@@ -293,7 +314,7 @@ function drawCmdsFromString(s: string) {
   }
 }
 
-function CommandTupleInput({value, cmds}: {value: CommandTuple; cmds:string[]}) {
+function CommandTupleInput({value, cmds}: {value: CommandTuple; cmds:string[]}):React.ReactElement[] {
   return(
     cmds.map((input, index) => {
       return(
@@ -383,14 +404,16 @@ function Variables({ state, dispatch }: ReducerProps) {
                     handleFormChange(index, {...e, target: {...e.target, value: r}});
                   }
 
+                  //<CommandTupleInput value={commandTuple} cmds={Object.keys(Turtle.drawOps())}/>
+//@ts-ignore
                   return ((commandTuple[0] === "nop")?
                  <select name="drawcmds" value={commandTuple[0]} onChange={(e)=>fn(0, e)}>
-                  <CommandTupleInput value={commandTuple} cmds={Object.keys(Turtle.drawOps())}/>
+                   {drawOps.map((x) => <option value={x}>{x}</option>)}
                  </select>
                   :
                  <div className="abc">
                    <select name="drawcmds" value={commandTuple[0]} onChange={(e)=>fn(0, e)}>
-                      <CommandTupleInput value={commandTuple} cmds={Object.keys(Turtle.drawOps())}/>
+                    {drawOps.map((x) => <option value={x}>{x}</option>)}
                     </select>
                   <input
                     name="drawcmds"
@@ -477,12 +500,12 @@ function Constants({ state, dispatch }: ReducerProps) {
 
                   return ((commandTuple[0] === "nop")?
                  <select name="drawcmds" value={commandTuple[0]} onChange={(e)=>fn(0, e)}>
-                  <CommandTupleInput value={commandTuple} cmds={Object.keys(Turtle.drawOps())}/>
+                    {drawOps.map((x) => <option value={x}>{x}</option>)}
                  </select>
                   :
                  <div className="abc">
                    <select name="drawcmds" value={commandTuple[0]} onChange={(e)=>fn(0, e)}>
-                      <CommandTupleInput value={commandTuple} cmds={Object.keys(Turtle.drawOps())}/>
+                      {drawOps.map((x) => <option value={x}>{x}</option>)}
                     </select>
                   <input
                     name="drawcmds"
@@ -549,7 +572,7 @@ function Probs({ state, dispatch }: ReducerProps) {
     }
   };
   const addFields = () => {
-    let newfield = ["", [["", 0]]];
+    let newfield:ProbEl = ["", []]
     setInputFields([...inputFields, newfield]);
   };
 
@@ -742,6 +765,7 @@ function App() {
           <li>Adding new rules and renaming preds is... weird (buggy). If you want to make a completely new alphabet, do it from scratch following the object structure and import it :)</li>
           <li>Object members don't update when settings are imported, though the drawing will change.</li>
           <li>Some controls don't work, like the Probabilistic controls, or the count option.</li>
+          <li>Some state is wonky and might not get exported properly. Sorry about that :(</li>
           <li>Generally just expect bugs. I just wanted to get something kinda working so people can play around and share things.</li>
           <li>Be sure to hit Export to the right and copy the text above to share!</li>
         </ul>
@@ -754,7 +778,7 @@ function App() {
         </p>
         <h4>Available drawing commands are:</h4>
         <ul>
-          {Object.keys(Turtle.drawOps()).map((inp, idx) => (<li><pre>{(inp !== "nop")? (inp+" n") : inp}</pre>-{opDocs[idx]}</li>))}
+          {drawOps.map((inp, idx) => (<li><pre>{(inp !== "nop")? (inp+" n") : inp}</pre>-{opDocs[idx]}</li>))}
         </ul>
       </div>
     </ErrorBoundary>
