@@ -226,6 +226,9 @@ export const dragonCurveAlphabet = {
   },
 };
 
+export var drawCommands:[string, number][] = []
+
+
 function draw(s: string, t: Turtle, a: IAlphabet) {
   interface StackFrame {
     x: number;
@@ -239,49 +242,7 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
   let pr = a.probs;
   //console.log(a.name);
 
-  let verbs = {
-    fwd: (steps) => {
-      t.moveForward(steps);
-    },
-    tcw: (amount) => {
-      t.turn("R", amount);
-    },
-    tcc: (amount) => {
-      t.turn("L", amount);
-    },
-    tup: (steps) => {
-      t.facing = "N";
-      t.moveForward(steps);
-    },
-    // c[rgb][+-](n): increases/decreases turtle red, green, blue by n.
-    "cr+": (amount) => {
-      t.color["r"] += clamp(amount, 0, 255);
-    },
-    "cr-": (amount) => {
-      t.color["r"] -= clamp(amount, 0, 255);
-    },
-    "cg+": (amount) => {
-      t.color["g"] += clamp(amount, 0, 255);
-    },
-    "cg-": (amount) => {
-      t.color["g"] -= clamp(amount, 0, 255);
-    },
-    "cb+": (amount) => {
-      t.color["b"] += clamp(amount, 0, 255);
-    },
-    "cb-": (amount) => {
-      t.color["b"] -= clamp(amount, 0, 255);
-    },
-    tnt: (amount) => {
-      t.tint(amount);
-    },
-    shd: (amount) => {
-      t.shade(amount);
-    },
-    nop: () => {
-      t.nop();
-    },
-  };
+  let verbs = Turtle.drawOps(t);
 
   stack = [];
   for (let i = 0; i <= s.length; i++) {

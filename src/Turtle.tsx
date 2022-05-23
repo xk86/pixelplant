@@ -19,7 +19,7 @@ export class Turtle {
   ctx: CanvasRenderingContext2D;
   penDown: boolean;
   facing: string;
-  directions: Array<string>;
+  drawOps: {[string]: Function}
 
   constructor(
     x: number,
@@ -36,8 +36,9 @@ export class Turtle {
     //                 b: 0,
     //                 a: 1.0};
     this.penDown = true;
-    this.facing = "N";
-    this.directions = [
+    this.facing = Turtle.directions[0]; // North
+  }
+    static directions = [
       "N",
       "NNE",
       "NE",
@@ -55,7 +56,52 @@ export class Turtle {
       "NW",
       "NNW",
     ]; //clockwise starting at N
-  }
+  static drawOps(t) {
+    return({
+      fwd: (steps) => {
+        t.moveForward(steps);
+      },
+      tcw: (amount) => {
+        t.turn("R", amount);
+      },
+      tcc: (amount) => {
+        t.turn("L", amount);
+      },
+      tup: (steps) => {
+        t.facing = "N";
+        t.moveForward(steps);
+      },
+      // c[rgb][+-](n): increases/decreases turtle red, green, blue by n.
+      "cr+": (amount) => {
+        t.color["r"] += clamp(amount, 0, 255);
+      },
+      "cr-": (amount) => {
+        t.color["r"] -= clamp(amount, 0, 255);
+      },
+      "cg+": (amount) => {
+        t.color["g"] += clamp(amount, 0, 255);
+      },
+      "cg-": (amount) => {
+        t.color["g"] -= clamp(amount, 0, 255);
+      },
+      "cb+": (amount) => {
+        t.color["b"] += clamp(amount, 0, 255);
+      },
+      "cb-": (amount) => {
+        t.color["b"] -= clamp(amount, 0, 255);
+      },
+      tnt: (amount) => {
+        t.tint(amount);
+      },
+      shd: (amount) => {
+        t.shade(amount);
+      },
+      nop: () => {
+        t.nop();
+      }
+    }
+    );
+    }
   colorstr() {
     return rgbaStr(this.color);
   }
@@ -77,17 +123,17 @@ export class Turtle {
   }
 
   turn(direction: string, amount: number) {
-    let i = this.directions.findIndex((e) => e === this.facing);
-    let l: number = (i - amount) % -this.directions.length;
-    let r: number = (i + amount) % this.directions.length;
+    let i = Turtle.directions.findIndex((e) => e === this.facing);
+    let l: number = (i - amount) % -Turtle.directions.length;
+    let r: number = (i + amount) % Turtle.directions.length;
 
     if (direction === "L") {
-      let f = this.directions.at(l);
+      let f = Turtle.directions.at(l);
       if (typeof f === "string") {
         this.facing = f;
       }
     } else if (direction === "R") {
-      let f = this.directions.at(r);
+      let f = Turtle.directions.at(r);
       if (typeof f === "string") {
         this.facing = f;
       }
@@ -250,4 +296,22 @@ export class Turtle {
         break;
     }
   }
-}
+};
+
+export const opDocs  = [
+  "moves forward n",
+  "turns clockwise n times",
+  "turns counterclockwise n times",
+  "faces turtle up and moves n",
+  "color red increase by n",
+  "color red decrease by n",
+  "color green increase by n",
+  "color green decrease byn",
+  "color blue increase by n",
+  "color blue decrease by n",
+  "tint (brighten) color by n (kinda broken)",
+  "shade (darken) color b n (kinda broken)",
+  "does nothing"
+]
+
+export const drawOps = Object.keys(Turtle.drawOps);
