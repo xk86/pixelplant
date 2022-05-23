@@ -721,6 +721,7 @@ function App() {
   );
   const [drawSettings, setDrawSettings] = React.useState({width: 150, height: 150, scale: 4, iters: 5, count: 1})
   console.log("render app");
+  console.log(drawOps)
   return (
     <ErrorBoundary>
       <div className="container">
@@ -778,7 +779,7 @@ function App() {
         </p>
         <h4>Available drawing commands are:</h4>
         <ul>
-          {drawOps.map((inp, idx) => (<li><pre>{(inp !== "nop")? (inp+" n") : inp}</pre>-{opDocs[idx]}</li>))}
+          {drawOps.map((inp, idx) => (<li key={idx}><pre>{(inp !== "nop")? (inp+" n") : inp}</pre>-{opDocs[idx]}</li>))}
         </ul>
       </div>
     </ErrorBoundary>

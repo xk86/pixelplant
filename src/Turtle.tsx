@@ -314,4 +314,4 @@ export const opDocs  = [
   "does nothing"
 ]
 
-export const drawOps = Object.keys(Turtle.drawOps);
+export const drawOps = Object.keys(Turtle.drawOps());
