@@ -229,7 +229,7 @@ export const dragonCurveAlphabet = {
 export var drawCommands:[string, number][] = []
 
 
-function draw(s: string, t: Turtle, a: IAlphabet) {
+function draw(sentence: string, turtle: Turtle, alphabet: IAlphabet) {
   interface StackFrame {
     x: number;
     y: number;
@@ -237,44 +237,42 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
     color: Color;
   }
   let stack:StackFrame[];
-  let va = a.variables;
-  let cn = a.constants;
-  let pr = a.probs;
-  //console.log(a.name);
+  let variables = alphabet.variables;
+  let constants = alphabet.constants;
+  let probs = alphabet.probs;
 
-  let verbs = Turtle.drawOps(t);
+  let verbs = Turtle.drawOps(turtle);
 
   stack = [];
-  for (let i = 0; i <= s.length; i++) {
-    let c = s[i];
-    if (pr != undefined && pr[c] != undefined) {
+  for (let i = 0; i <= sentence.length; i++) {
+    let symbol = sentence[i];
+    if (probs != undefined && probs[symbol] != undefined) {
       verbs["nop"]();
-    } else if (cn[c] != undefined) {
-      if (c === "[") {
+    } else if (constants[symbol] != undefined) {
+      if (symbol === "[") {
         stack.push({
-          x: t.x,
-          y: t.y,
-          facing: t.facing,
-          color: Object.assign({}, t.color),
+          x: turtle.x,
+          y: turtle.y,
+          facing: turtle.facing,
+          color: Object.assign({}, turtle.color),
         });
         //        t.color = {r:0,g:127,b:0,a:1};
-      } else if (c === "]") {
-        let o = stack.pop();
-        if (o !== undefined) {
-          t.x = o.x;
-          t.y = o.y;
-          t.facing = o.facing;
-          t.color = o.color;
+      } else if (symbol === "]") {
+        let frame = stack.pop();
+        if (frame !== undefined) {
+          turtle.x = frame.x;
+          turtle.y = frame.y;
+          turtle.facing = frame.facing;
+          turtle.color = frame.color;
         }
       }
-      for (let i = 0; i < cn[c].length; i++) {
-        let [verb, arg] = cn[c][i];
+      for (let i = 0; i < constants[symbol].length; i++) {
+        let [verb, arg] = constants[symbol][i];
         verbs[verb](arg);
       }
-    } else if (va[c] != undefined) {
-//      console.log(280, va[c])
-      for (let i = 0; i < va[c][1].length; i++) {
-        let [verb, arg] = va[c][1][i];
+    } else if (variables[symbol] != undefined) {
+      for (let i = 0; i < variables[symbol][1].length; i++) {
+        let [verb, arg] = variables[symbol][1][i];
         verbs[verb](arg);
       }
     } else {
