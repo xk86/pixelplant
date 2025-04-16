@@ -1,9 +1,36 @@
 import React, { ReactNode } from "react";
 import ReactDOM from "react-dom/client";
 import { Turtle, drawOps, opDocs } from "./Turtle";
-import { fernAlphabet, exampleAlphabet, binaryTreeAlphabet, probAlphabet, dragonCurveAlphabet, prodAlphabet,
-         IAlphabet, VariableProperties, CommandTuple, DrawCommandTuples, ProbTuple, applyRules, computeSentence} from "./Lsystems"
+import { binaryTreeAlphabet, probAlphabet,
+         IAlphabet, SymbolRef, CommandTuple, 
+         DrawCommandTuples, applyRules, computeSentence} from "./Lsystems"
+import {Variables} from "./Variables"
+import {Constants} from "./Constants"
+import {Probs} from "./Probs"
 import "./App.css";
+
+function resolveSuccessors(alphabet: IAlphabet): IAlphabet {
+  const symbolMap = new Map(alphabet.symbols.map(s => [s.id, s]));
+  const resolvedSymbols = alphabet.symbols.map(symbol => {
+    if (symbol.successor) {
+      symbol = {
+        ...symbol,
+        successor: symbol.successor.map(s => symbolMap.get(s.id) || s)
+      };
+    }
+    if (symbol.probs) {
+      symbol = {
+        ...symbol,
+        probs: symbol.probs.map(([seq, weight]) => [
+          seq.map(s => symbolMap.get(s.id) || s),
+          weight
+        ])
+      };
+    }
+    return symbol;
+  });
+  return { ...alphabet, symbols: resolvedSymbols };
+}
 
 //@ts-ignore
 //const controls = ReactDOM.createRoot(document.getElementById("controls"));
@@ -101,52 +128,44 @@ interface resetAction {
 // Putting it all together...
 type AllAction = nameAction
                | axiomAction
-               | variableAction
-               | constantAction
+               | SymbolUpdateAction
                | loadAction
                | resetAction;
 
+interface SymbolUpdateAction {
+  type: "updateSymbols";
+  payload: SymbolRef[];
+}
+
 function alphabetReducer(state: AlphabetState, action: AllAction) {
-//  const newAlphabet = Object.assign({}, state.alphabet);
-  let na;
   switch(action.type) {
-      case 'variable':
-        console.log(511,action.payload);
-        na = {
-          alphabet: {
+      case 'updateSymbols':
+        return {
+          alphabet: resolveSuccessors({
             ...state.alphabet,
-            variables: {
-              ...state.alphabet.variables,
-              [action.payload.predecessor]: [action.payload.successor, action.payload.drawcmds]
-            }
-          }
-        }
-        return na;
-      case 'constant':
-        na = {
-          alphabet: {
-            ...state.alphabet,
-            constants: {
-              ...state.alphabet.constants,
-              [action.payload.predecessor]: action.payload.drawcmds
-            }
-          }
-        }
-        return na;
+            symbols: action.payload,
+          }),
+        };
       case 'name':
-        return { alphabet:
-          {...state.alphabet,
-           name: action.payload.name} }
+        return { 
+          alphabet: {
+            ...state.alphabet,
+           name: action.payload.name
+          },
+        };
       case 'axiom':
-        return { alphabet: {...state.alphabet,
-          axiom: action.payload.axiom} }
+        return { 
+          alphabet: {
+            ...state.alphabet,
+            axiom: action.payload.axiom
+          },
+        };
       case 'load':
-        na = action.payload;
-        return na;
+        return { alphabet: resolveSuccessors(action.payload.alphabet) };
       case 'reset':
-        na = initAlphabetState({...state.alphabet});
-        console.log(526,na);
-        return na;
+        return initAlphabetState({...state.alphabet});
+      default:
+        return state;
   }
 }
 
@@ -185,28 +204,28 @@ function Name(props) {
 }
 
 function Axiom(props) {
-  let t = {...props.alphabet}.axiom
-  let [inputText, setInputText] = React.useState(t)
-  console.log(inputText)
+  let initialAxiom = props.alphabet.axiom.map(sym => sym.id).join("");
+  let [inputText, setInputText] = React.useState(initialAxiom);
 
   const handleChange = (event) => {
     event.preventDefault();
-    console.log(event.target.value)
-    setInputText(event.target.value)
-    props.dispatch({type: 'axiom', payload: {axiom: inputText}})
-  }
+    setInputText(event.target.value);
+  };
   const submit = (e) => {
     e.preventDefault();
+    const axiom = eventToSymbolRefs(inputText, props.alphabet.symbols);
     props.dispatch({
-        type: "axiom",
-        payload: {axiom: inputText},
-      });
-    props.dispatch({type: "reset", payload: {alphabet: props.alphabet}});
-    }
+      type: "axiom",
+      payload: { axiom }
+    });
+    props.dispatch({ type: "reset", payload: { alphabet: props.alphabet } });
+  };
 
   return (
     <div>
-      <form onSubmit={submit}><input type="text" value={inputText} onChange={(e)=>handleChange(e)}></input></form>
+      <form onSubmit={submit}>
+        <input type="text" value={inputText} onChange={(e)=>handleChange(e)} />
+      </form>
     </div>
   );
 }
@@ -328,313 +347,6 @@ function CommandTupleInput({value, cmds}: {value: CommandTuple; cmds:string[]}):
 }
 
 
-function Variables({ state, dispatch }: ReducerProps) {
-  const alphabet = state.alphabet;
-  const populateFields = () => {
-    let a:VarEl[] = [];
-    let v = alphabet.variables;
-    for (let r in v) {
-      let vp:VariableProperties = v[r]
-      let newfield:VarEl = {predecessor: r, successor: vp[0], drawcmds: vp[1]}
-      a = [...a, newfield];
-    }
-    return a;
-  };
-
-  const [inputFields, setInputFields] = React.useState([...populateFields()]);
-
-  const handleFormChange = (index: number, event) => {
-    let data = [...inputFields];
-    console.log(data,event.target.name)
-//    console.log(668, data[index]);
-    data[index][event.target.name] = event.target.value;
-    dispatch({type: "variable", payload: {...data[index],
-                                          [event.target.name]: event.target.value}}
-    );
-    setInputFields(data);
-  };
-
-  const addFields = () => {
-    let newfield:VarEl= {predecessor: "", successor: "", drawcmds: []};
-    setInputFields([...inputFields, newfield]);
-  };
-
-  const addDraw = (input:VarEl, index:number) => {
-    handleFormChange(index, {target: {name: "drawcmds", value:[...input.drawcmds, ["nop"]]}});
-  }
-
-  const submit = (e) => {
-    e.preventDefault();
-    dispatch({type: "reset"});
-    for (let variable of inputFields) {
-      dispatch({
-        type: "variable",
-        payload: variable,
-      });
-    }
-  };
-
-  //  populateFields();
-
-  return (
-    <div className="Variables">
-      <form onSubmit={submit}>
-        <h2>Variables</h2>
-        {inputFields.map((input:VarEl, index:number) => {
-          return (
-            <div key={index} className="varItems">
-              <input
-                name="predecessor"
-                placeholder="Predecessor"
-                value={input.predecessor}
-                maxLength={1}
-                onChange={(event) => handleFormChange(index, event)}
-              />
-              <input
-                name="successor"
-                placeholder="Successor"
-                value={input.successor}
-                onChange={(event) => handleFormChange(index, event)}
-              />
-              {input.drawcmds.map((commandTuple, idx) =>
-                {
-                  let r = [...input.drawcmds];
-                  let fn = (i, e) => {
-                    let v = [...r][idx][i] = e.target.value
-                    handleFormChange(index, {...e, target: {...e.target, value: r}});
-                  }
-
-                  //<CommandTupleInput value={commandTuple} cmds={Object.keys(Turtle.drawOps())}/>
-//@ts-ignore
-                  return ((commandTuple[0] === "nop")?
-                 <select name="drawcmds" value={commandTuple[0]} onChange={(e)=>fn(0, e)}>
-                   {drawOps.map((x) => <option value={x}>{x}</option>)}
-                 </select>
-                  :
-                 <div className="abc">
-                   <select name="drawcmds" value={commandTuple[0]} onChange={(e)=>fn(0, e)}>
-                    {drawOps.map((x) => <option value={x}>{x}</option>)}
-                    </select>
-                  <input
-                    name="drawcmds"
-                    placeholder="0"
-                    value={commandTuple[1]}
-                    onChange={(e)=>fn(1, e)}
-                  />
-                </div>
-                )}
-
-              )}
-                <button type="button" onClick={()=>{addDraw(input, index)}}>+</button>
-            </div>
-          );
-        })}
-        <br /> <br />
-        <button type="button" onClick={addFields}>
-          Add more...
-        </button>
-        <button>Submit</button>
-      </form>
-    </div>
-  );
-}
-
-function Constants({ state, dispatch }: ReducerProps) {
-  const alphabet = state.alphabet;
-  const populateFields = () => {
-    let a: ConstEl[] = [];
-    let c = alphabet.constants;
-    for (let r in c) {
-      let newfield:ConstEl = {predecessor: r, drawcmds: c[r]}
-      a = [...a, newfield];
-    }
-    return a;
-  };
-  const handleFormChange = (index, event) => {
-    let data = [...inputFields];
-    console.log(event)
-    data[index][event.target.name] = event.target.value;
-    dispatch({type: "constant", payload: {...data[index],
-                                          [event.target.name]: event.target.value}}
-    );
-    setInputFields(data);
-  };
-  const [inputFields, setInputFields] = React.useState([...populateFields()]);
-  const submit = (e) => {
-    e.preventDefault();
-    for (let i of inputFields) {
-//      dispatch({
-//        type: "replaceVRw",
-//        payload: { target: i["rule"], contents: i["rewrite"] },
-//      });
-    }
-  };
-  const addFields = () => {
-    let newfield:ConstEl = {predecessor: "", drawcmds: []};
-    setInputFields([...inputFields, newfield]);
-  };
-  const addDraw = (input:ConstEl, index:number) => {
-    handleFormChange(index, {target: {name: "drawcmds", value:[...input.drawcmds, ["nop"]]}});
-  }
-  return (
-    <div className="Constants">
-      <form onSubmit={submit}>
-        <h2>Constants</h2>
-        {inputFields.map((input, index) => {
-          return (
-            <div key={index} className="constItems">
-        <br/>
-              <input
-                name="predecessor"
-                placeholder="Rule"
-                value={input.predecessor}
-                onChange={(event) => handleFormChange(index, event)}
-              />
-              {input.drawcmds.map((commandTuple, idx) =>
-                {
-                  let r = [...input.drawcmds];
-                  let fn = (i, e) => {
-                    let v = [...r][idx][i] = e.target.value
-                    handleFormChange(index, {...e, target: {...e.target, value: r}});
-                  }
-
-                  return ((commandTuple[0] === "nop")?
-                 <select name="drawcmds" value={commandTuple[0]} onChange={(e)=>fn(0, e)}>
-                    {drawOps.map((x) => <option value={x}>{x}</option>)}
-                 </select>
-                  :
-                 <div className="abc">
-                   <select name="drawcmds" value={commandTuple[0]} onChange={(e)=>fn(0, e)}>
-                      {drawOps.map((x) => <option value={x}>{x}</option>)}
-                    </select>
-                  <input
-                    name="drawcmds"
-                    placeholder="0"
-                    value={commandTuple[1]}
-                    onChange={(e)=>fn(1, e)}
-                  />
-                </div>
-                )}
-
-              )}
-                <button type="button" onClick={()=>{addDraw(input, index)}}>+</button>
-            </div>
-          );
-        })}
-        <br />
-        <button type="button" onClick={addFields}>
-          Add more...
-        </button>
-        <button>Submit</button>
-      </form>
-    </div>
-  );
-}
-
-function Probs({ state, dispatch }: ReducerProps) {
-  type ProbEl = [string, ProbTuple[]];
-  const alphabet = state.alphabet;
-  const populateFields = () => {
-    let a:ProbEl[] = [];
-    let p = alphabet.probs;
-    for (let r in p) {
-      let newfield:ProbEl = [r, p[r]];
-      a = [...a, newfield];
-    }
-    return a;
-  };
-  const handleFormChange = (index:number | [number, number], event) => {
-    let data = [...inputFields];
-    switch(event.target.name) {
-        case 'branchRewrite':
-          console.log(808,data[index[0]])
-//          data[index[0]][1][index[1]][0] = event.target.value;
-//          setInputFields(data);
-        case 'rule':
-          console.log(812,Object.keys(data))
-//          data[index[0]][event.target.name] = event.target.value;
-//          setInputFields(data);
-    }
-  };
-
-
-  const [inputFields, setInputFields] = React.useState([...populateFields()]);
-  const submit = (e) => {
-    e.preventDefault();
-    for (let i of inputFields) {
-      dispatch({
-        type: "replacePRw"
-      })
-//      dispatch({
-//        type: "replaceVRw",
-//        payload: { target: i["rule"], contents: i["rewrite"] },
-//      });
-    }
-  };
-  const addFields = () => {
-    let newfield:ProbEl = ["", []]
-    setInputFields([...inputFields, newfield]);
-  };
-
-  const branches = (bs:ProbTuple[], idx:number) => {
-    let a:ProbTuple[] = [];
-    for (let b of bs) {
-      a = a.concat([b]);
-    }
-    return(a.map((input, index) => {
-      return (
-        <div key={index} className="probBranch">
-          <input
-            name="branchRewrite"
-            placeholder="Branch Successor"
-            value={input[0]}
-            onChange={(event) => handleFormChange([idx, index], event)}
-          />
-          <input
-            name="branchProb"
-            placeholder="Branch Probability"
-            value={input[1]}
-            type="number"
-            min="0"
-            max="1"
-            step="0.001"
-            onChange={(event) => handleFormChange([idx, index], event)}
-          />
-        </div>
-      );
-    }
-    ));
-  }
-
-  return (
-    <div className="Probs">
-      <form onSubmit={submit}>
-        <h2>Probabalistic Rules</h2>
-        {inputFields.map((input, index) => {
-          return (
-            <div key={index} className="probItems">
-              <input
-                name="predecessor"
-                placeholder="Predecessor"
-                value={input[0]}
-                onChange={(event) => handleFormChange(index, event)}
-              />
-              {branches(input[1], index)}
-              <button type="button" onClick={addFields}>
-                +
-              </button>
-            </div>
-          );
-        })}
-        <button type="button" onClick={addFields}>
-          Add more...
-        </button>
-        <button>Submit</button>
-      </form>
-    </div>
-  );
-
-}
 
 interface DrawSettings {
   width: number;
@@ -715,8 +427,8 @@ function App() {
   //  const [currentAlphabet, setCurrentAlphabet] = React.useState(exampleAlphabet);
   const [state, dispatch] = React.useReducer(
     alphabetReducer,
-    prodAlphabet,
-    //binaryTreeAlphabet,
+    //prodAlphabet,
+    binaryTreeAlphabet,
     initAlphabetState
   );
   const [drawSettings, setDrawSettings] = React.useState({width: 150, height: 150, scale: 4, iters: 5, count: 1})
@@ -737,7 +449,7 @@ function App() {
         <p>The plants are drawn using procedures defined as L-systems, which are a family of rewriting rules, specifically made to replicate biological processes like cellular development.
           Each plant starts as a single sentence, called the "axiom".
           The characters (letters) in the axiom are replaced recursively (which means the result of the first replacement is used as the start for the next).
-          So, if you have an axiom "{state.alphabet.axiom}", the rewriter will start with the first letter ("{state.alphabet.axiom[0]}"), and replace it with the successor string (found next to that letter in the controls interface), if it has one.
+          So, if you have an axiom <RenderAxiom axiom={state.alphabet.axiom} />, the rewriter will start with the first letter ("{state.alphabet.axiom[0]?.id}"), and replace it with the successor string (found next to that letter in the controls interface), if it has one.
         </p>
         <p>
           After a certain number of iterations ({drawSettings.iters} right now, see: iters control in the top left), the plant will be drawn by a simple turtle language.
@@ -796,5 +508,15 @@ function App() {
 //}
 //ctx.fillRect(15,30,1,2);
 //ctx.fillRect(16,28,1,2);
+
+// Converts a string of IDs to SymbolRef[] using lookup from defined symbols
+function eventToSymbolRefs(str, symbols) {
+  const symbolMap = new Map(symbols.map(s => [s.id, s]));
+  return str.split("").map(id => symbolMap.get(id)).filter(Boolean);
+}
+
+function RenderAxiom({ axiom }: { axiom: SymbolRef[] }): JSX.Element {
+  return <span>{axiom.map((sym, idx) => <span key={idx}>{sym.id}</span>)}</span>;
+}
 
 export default App;

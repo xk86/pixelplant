@@ -1,60 +1,75 @@
 import {Turtle, Color, clamp} from "./Turtle";
 
+export type SymbolType = "variable" | "constant" | "prob"
+type SymbolStub = Pick<SymbolRef, "id">;
 
-export function applyRules(t, sentence, fn, n, alphabet) {
-  let end = sentence;
-  for (var i = 1; i <= n; i++) {
-    //console.log(end);
-    end = fn(end, alphabet);
-    if (i == n) {
-      draw(end, t, alphabet);
-    }
-  }
-  return end;
+interface SymbolRef {
+  id: string;
+  label: string;
+  type: SymbolType;
+  drawCommands?: DrawCommandTuples;
+  successor?: SymbolStub[];
+  probs?: [SymbolStub[], number][];
 }
-export function computeSentence(s, a) {
-  let end = "";
-  let va = a.variables;
-  let cn = a.constants;
-  let pr = a.probs;
 
-  for (let i = 0; i < s.length; i++) {
-    let c = s[i];
-    //  console.log(c)
-    if (va[c] != undefined) {
-      end += va[c][0];
-    } else if (cn[c] != undefined) {
-      end += c;
-    } else if (pr != undefined && pr[c] != undefined) {
-      let items = [];
-      let probs = [];
-
-      for (let j = 0; j < pr[c].length; j++) {
-        items = items.concat(pr[c][j][0]);
-        probs = probs.concat(pr[c][j][1]);
-      }
-      //  console.log(items);
-      end += weighted_random(items, probs);
-    } else {
-      end += "";
-    }
-  }
-  return end;
-}
 export type CommandTuple = [string, number] | ["nop"];
 export type DrawCommandTuples = CommandTuple[];
-export type VariableProperties = [string, DrawCommandTuples];
-export type Variable = { [predecessor: string]: VariableProperties };
-export type Constant = { [name: string]: DrawCommandTuples };
-export type ProbTuple = [string, number];
-export type Prob = { [name: string]: ProbTuple[] };
+//export type VariableProperties = [string, DrawCommandTuples];
+//export type Variable = { [predecessor: string]: VariableProperties };
+//export type Constant = { [name: string]: DrawCommandTuples };
+//export type ProbTuple = [string, number];
+//export type Prob = { [name: string]: ProbTuple[] };
 export interface IAlphabet {
   name: string;
-  axiom: string;
-  variables: Variable;
-  constants: Constant;
-  probs?: Prob;
+  axiom: SymbolRef[];
+  symbols: SymbolRef[];
 }
+
+export function applyRules(
+  turtle: Turtle,
+  sentence: SymbolRef[],
+  fn: (s: SymbolRef[], a: IAlphabet) => SymbolRef[],
+  n: number,
+  alphabet: IAlphabet
+): SymbolRef[] {
+  let end = sentence;
+  for (let i = 1; i <= n; i++) {
+    end = fn(end, alphabet);
+    if (i === n) {
+      draw(end, turtle, alphabet);
+    }
+  }
+  return end;
+}
+
+export function computeSentence(s: SymbolRef[], a: IAlphabet): SymbolRef[] {
+  const end: SymbolRef[] = [];
+  const symbolMap = new Map(a.symbols.map(sym => [sym.id, sym]));
+ 
+  for (const symbol of s) {
+    if (!symbol || !symbol.type) continue;
+ 
+    if (symbol.type === "variable" && symbol.successor) {
+      const expanded = symbol.successor
+        .map((s: { id: string }) => symbolMap.get(s.id))
+        .filter((s): s is SymbolRef => !!s);
+      end.push(...expanded);
+    } else if (symbol.type === "constant") {
+      const full = symbolMap.get(symbol.id);
+      if (full) end.push(full);
+    } else if (symbol.type === "prob" && symbol.probs) {
+      const options = symbol.probs.map(([seq, _]) =>
+        seq.map((s: { id: string }) => symbolMap.get(s.id)).filter((s): s is SymbolRef => !!s)
+      );
+      const weights = symbol.probs.map(([_, weight]) => weight);
+      const chosen = weighted_random(options, weights);
+      end.push(...chosen);
+    }
+  }
+ 
+  return end;
+}
+
 export const exampleAlphabet: IAlphabet = {
   // Fields: name, axiom, variables, constants, probs
   name: "Example/Documentation Alphabet",
@@ -99,12 +114,52 @@ export const exampleAlphabet: IAlphabet = {
 };
 export const binaryTreeAlphabet: IAlphabet = {
   name: "Binary Tree",
-  axiom: "B",
-  //variables: process rule [0], drawing commands and parameters in [1]
-  variables: { A: ["AA", [["fwd", 2]]], B: ["A[B]B", [["fwd", 2]]] },
-  //constants: draw commands, params (no re-write rules).
-  constants: { "[": [["tcw", 2]], "]": [["tcc", 2]] },
+  axiom: [
+    {
+      id: "B",
+      label: "Root",
+      type: "variable",
+    },
+  ],
+  symbols: [
+    {
+      id: "A",
+      label: "Branch",
+      type: "variable",
+      drawCommands: [["fwd", 2]],
+      successor: [
+        { id: "A" },
+        { id: "A" },
+      ],
+    },
+    {
+      id: "B",
+      label: "Root",
+      type: "variable",
+      drawCommands: [["fwd", 2]],
+      successor: [
+        { id: "A" },
+        { id: "[" },
+        { id: "B" },
+        { id: "]" },
+        { id: "B" },
+      ],
+    },
+    {
+      id: "[",
+      label: "Push State",
+      type: "constant",
+      drawCommands: [["tcw", 2]],
+    },
+    {
+      id: "]",
+      label: "Pop State",
+      type: "constant",
+      drawCommands: [["tcc", 2]],
+    },
+  ],
 };
+
 export const probAlphabet: IAlphabet = {
   name: "Prob",
   axiom: "y",
@@ -229,56 +284,43 @@ export const dragonCurveAlphabet = {
 export var drawCommands:[string, number][] = []
 
 
-function draw(s: string, t: Turtle, a: IAlphabet) {
+function draw(s: SymbolRef[], t: Turtle, a: IAlphabet) {
   interface StackFrame {
     x: number;
     y: number;
     facing: string;
     color: Color;
   }
-  let stack:StackFrame[];
-  let va = a.variables;
-  let cn = a.constants;
-  let pr = a.probs;
-  //console.log(a.name);
 
-  let verbs = Turtle.drawOps(t);
+  console.log(s)
 
-  stack = [];
-  for (let i = 0; i <= s.length; i++) {
-    let c = s[i];
-    if (pr != undefined && pr[c] != undefined) {
-      verbs["nop"]();
-    } else if (cn[c] != undefined) {
-      if (c === "[") {
-        stack.push({
-          x: t.x,
-          y: t.y,
-          facing: t.facing,
-          color: Object.assign({}, t.color),
-        });
-        //        t.color = {r:0,g:127,b:0,a:1};
-      } else if (c === "]") {
-        let o = stack.pop();
-        if (o !== undefined) {
-          t.x = o.x;
-          t.y = o.y;
-          t.facing = o.facing;
-          t.color = o.color;
-        }
+  const stack: StackFrame[] = [];
+  const verbs = Turtle.drawOps(t);
+
+  for (const symbol of s) {
+    if (!symbol || !symbol.type) continue;
+
+    if (symbol.id === "[") {
+      stack.push({
+        x: t.x,
+        y: t.y,
+        facing: t.facing,
+        color: Object.assign({}, t.color),
+      });
+    } else if (symbol.id === "]") {
+      const o = stack.pop();
+      if (o !== undefined) {
+        t.x = o.x;
+        t.y = o.y;
+        t.facing = o.facing;
+        t.color = o.color;
       }
-      for (let i = 0; i < cn[c].length; i++) {
-        let [verb, arg] = cn[c][i];
+    }
+
+    if (symbol.drawCommands) {
+      for (const [verb, arg] of symbol.drawCommands) {
         verbs[verb](arg);
       }
-    } else if (va[c] != undefined) {
-//      console.log(280, va[c])
-      for (let i = 0; i < va[c][1].length; i++) {
-        let [verb, arg] = va[c][1][i];
-        verbs[verb](arg);
-      }
-    } else {
-      break;
     }
   }
 }
