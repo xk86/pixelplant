@@ -1,3 +1,4 @@
+import { Turtle, drawOps } from "./Turtle";
 import React from "react";
 
 export function Variables({ state, dispatch }: ReducerProps) {
