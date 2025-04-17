@@ -33,6 +33,24 @@ export function listToMapAlpha(L: ListAlphabet): IAlphabet {
   };
 }
 
+function mapToListAlpha(alpha: IAlphabet): EditorState {
+  return {
+    name: alpha.name,
+    axiom: Array.from(alpha.axiom),
+    variables: Object.entries(alpha.variables).map(
+      ([id,[succ,drawcmds]]) => ({ id, type:'variable', successor: succ, drawcmds })
+    ),
+    constants: Object.entries(alpha.constants).map(
+      ([id, drawcmds]) => ({ id, type:'constant', drawcmds })
+    ),
+    probabilistics: alpha.probs
+      ? Object.entries(alpha.probs).map(
+          ([id, branches]) => ({ id, type:'probabilistic', branches })
+        )
+      : []
+  }
+}
+
 export function applyRules(turtle: Turtle, sentence: string, fn, n, alphabet) {
   let end = sentence;
   for (var i = 1; i <= n; i++) {
