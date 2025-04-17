@@ -89,29 +89,29 @@ export function applyRules(turtle: Turtle, sentence: string, fn, n, alphabet) {
   return end;
 }
 
-export function computeSentence(s, a) {
+export function computeSentence(sentence: string, alphabet: IAlphabet) {
   let end = "";
-  let va = a.variables;
-  let cn = a.constants;
-  let pr = a.probs;
+  let variables = alphabet.variables;
+  let constants = alphabet.constants;
+  let probs     = alphabet.probs;
 
-  for (let i = 0; i < s.length; i++) {
-    let c = s[i];
+  for (let i = 0; i < sentence.length; i++) {
+    let symbol = sentence[i];
     //  console.log(c)
-    if (va[c] != undefined) {
-      end += va[c][0];
-    } else if (cn[c] != undefined) {
-      end += c;
-    } else if (pr != undefined && pr[c] != undefined) {
+    if (variables[symbol] != undefined) {
+      end += variables[symbol][0];
+    } else if (constants[symbol] != undefined) {
+      end += symbol;
+    } else if (probs != undefined && probs[symbol] != undefined) {
       let items = [];
-      let probs = [];
+      let probsResult = [];
 
-      for (let j = 0; j < pr[c].length; j++) {
-        items = items.concat(pr[c][j][0]);
-        probs = probs.concat(pr[c][j][1]);
+      for (let j = 0; j < probs[symbol].length; j++) {
+        items = items.concat(probs[symbol][j][0]);
+        probsResult = probsResult.concat(probs[symbol][j][1]);
       }
       //  console.log(items);
-      end += weighted_random(items, probs);
+      end += weighted_random(items, probsResult);
     } else {
       end += "";
     }
