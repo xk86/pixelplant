@@ -25,7 +25,7 @@ export function RuleEditor<T extends object>({
   // initialize once on mount
   React.useEffect(() => {
     const data = onInit()
-    // if you want to seed local state here, call dispatch/reset etc
+    // to seed local state here, call dispatch/reset etc
   }, [])
 
   return (
