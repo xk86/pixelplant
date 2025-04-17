@@ -21,6 +21,15 @@ export function Constants({ state, dispatch }: ReducerProps) {
   );
 
   const idCounter = useRef(0);
+  // Prevent duplicate IDs
+  const handleIdChange = (index: number, newId: string) => {
+    if (entries.some((e, idx) => idx !== index && e.id === newId)) {
+      return; // ignore duplicate
+    }
+    onChange(entries.map((e, idx) =>
+      idx === index ? { ...e, id: newId } : e
+    ));
+  };
 
   return (
     <section>
@@ -38,7 +47,7 @@ export function Constants({ state, dispatch }: ReducerProps) {
               name="id"
               placeholder="Constant"
               value={entry.id}
-              onChange={e => onField('id', e.target.value)}
+              onChange={e => handleIdChange(i, e.target.value)}
             />
             {entry.drawcmds.map((cmd, idx) => (
               <div key={idx} className="flex items-center">
