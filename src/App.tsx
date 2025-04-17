@@ -1,12 +1,12 @@
 import React, { ReactNode } from "react";
 import ReactDOM from "react-dom/client";
 import { Turtle, drawOps, opDocs } from "./Turtle";
-import { fernAlphabet, exampleAlphabet, binaryTreeAlphabet, probAlphabet, 
-         dragonCurveAlphabet, prodAlphabet,
-         IAlphabet, VariableProperties, CommandTuple, DrawCommandTuples, 
-         ProbTuple, applyRules, listToMapAlpha, computeSentence} from "./Lsystems"
+import { IAlphabet, VariableProperties, CommandTuple, DrawCommandTuples, 
+         ProbTuple, applyRules, listToMapAlpha, computeSentence} from "./Lsystems";
 
-import {Variables, Constants, Probs} from "./SymbolComponents"
+import { prodAlphabet } from "./old_example_alphabets";
+
+import {Variables, SymbolBlock, Constants, Probs} from "./SymbolComponents";
 
 import "./App.css";
 
@@ -385,6 +385,7 @@ function DrawControls({settings, setFn, dispatch}) {
 
 }
 
+// Component for importing and exporting from/to string.
 function ImpExport({state, dispatch}: ReducerProps) {
   const [inputValue, setInputValue] = React.useState(btoa(JSON.stringify({...state})));
   function exp() {
