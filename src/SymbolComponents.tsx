@@ -1,14 +1,68 @@
 import { Turtle, drawOps } from "./Turtle";
+import { DrawCommandTuples } from "./Lsystems";
 import React from "react";
+
+// Various state element interfaces
+interface NameElement {
+  name: string;
+}
+interface AxiomElement {
+  axiom: string;
+}
+interface VariableElement {
+  predecessor: string;
+  successor: string;
+  drawcmds: DrawCommandTuples;
+}
+interface ConstElement {
+  predecessor: string;
+  drawcmds: DrawCommandTuples;
+}
+interface ProbElement {
+  predecessor: string;
+  probs: any; // TODO
+}
+
+// Reducer action interfaces
+export interface nameAction {
+  type: "name";
+  payload: NameElement;
+}
+
+export interface axiomAction {
+  type: "axiom";
+  payload: AxiomElement;
+}
+
+export interface variableAction {
+  type: "variable";
+  payload: VariableElement;
+}
+
+export interface constantAction {
+  type: 'constant';
+  payload: ConstElement;
+}
+
+
+export function SymbolBlock({ symbol, index }) {
+  return (
+    <div data-symbol-id={symbol.id}
+    >
+      {symbol.id}
+    </div>
+  )
+}
 
 export function Variables({ state, dispatch }: ReducerProps) {
   const alphabet = state.alphabet;
+
   const populateFields = () => {
-    let a:VarEl[] = [];
+    let a:VariableElement[] = [];
     let v = alphabet.variables;
     for (let r in v) {
       let vp:VariableProperties = v[r]
-      let newfield:VarEl = {predecessor: r, successor: vp[0], drawcmds: vp[1]}
+      let newfield:VariableElement = {predecessor: r, successor: vp[0], drawcmds: vp[1]}
       a = [...a, newfield];
     }
     return a;
@@ -19,7 +73,6 @@ export function Variables({ state, dispatch }: ReducerProps) {
   const handleFormChange = (index: number, event) => {
     let data = [...inputFields];
     console.log(data,event.target.name)
-//    console.log(668, data[index]);
     data[index][event.target.name] = event.target.value;
     dispatch({type: "variable", payload: {...data[index],
                                           [event.target.name]: event.target.value}}
@@ -28,11 +81,11 @@ export function Variables({ state, dispatch }: ReducerProps) {
   };
 
   const addFields = () => {
-    let newfield:VarEl= {predecessor: "", successor: "", drawcmds: []};
+    let newfield:VariableElement= {predecessor: "", successor: "", drawcmds: []};
     setInputFields([...inputFields, newfield]);
   };
 
-  const addDraw = (input:VarEl, index:number) => {
+  const addDraw = (input:VariableElement, index:number) => {
     handleFormChange(index, {target: {name: "drawcmds", value:[...input.drawcmds, ["nop"]]}});
   }
 
@@ -53,7 +106,7 @@ export function Variables({ state, dispatch }: ReducerProps) {
     <div className="Variables">
       <form onSubmit={submit}>
         <h2>Variables</h2>
-        {inputFields.map((input:VarEl, index:number) => {
+        {inputFields.map((input:VariableElement, index:number) => {
           return (
             <div key={index} className="varItems">
               <input
@@ -115,10 +168,10 @@ export function Variables({ state, dispatch }: ReducerProps) {
 export function Constants({ state, dispatch }: ReducerProps) {
   const alphabet = state.alphabet;
   const populateFields = () => {
-    let a: ConstEl[] = [];
+    let a: ConstElement[] = [];
     let c = alphabet.constants;
     for (let r in c) {
-      let newfield:ConstEl = {predecessor: r, drawcmds: c[r]}
+      let newfield:ConstElement = {predecessor: r, drawcmds: c[r]}
       a = [...a, newfield];
     }
     return a;
@@ -143,10 +196,10 @@ export function Constants({ state, dispatch }: ReducerProps) {
     }
   };
   const addFields = () => {
-    let newfield:ConstEl = {predecessor: "", drawcmds: []};
+    let newfield:ConstElement = {predecessor: "", drawcmds: []};
     setInputFields([...inputFields, newfield]);
   };
-  const addDraw = (input:ConstEl, index:number) => {
+  const addDraw = (input:ConstElement, index:number) => {
     handleFormChange(index, {target: {name: "drawcmds", value:[...input.drawcmds, ["nop"]]}});
   }
   return (
@@ -205,13 +258,13 @@ export function Constants({ state, dispatch }: ReducerProps) {
 }
 
 export function Probs({ state, dispatch }: ReducerProps) {
-  type ProbEl = [string, ProbTuple[]];
+  type ProbElement = [string, ProbTuple[]];
   const alphabet = state.alphabet;
   const populateFields = () => {
-    let a:ProbEl[] = [];
+    let a:ProbElement[] = [];
     let p = alphabet.probs;
     for (let r in p) {
-      let newfield:ProbEl = [r, p[r]];
+      let newfield:ProbElement = [r, p[r]];
       a = [...a, newfield];
     }
     return a;
@@ -245,7 +298,7 @@ export function Probs({ state, dispatch }: ReducerProps) {
     }
   };
   const addFields = () => {
-    let newfield:ProbEl = ["", []]
+    let newfield:ProbElement = ["", []]
     setInputFields([...inputFields, newfield]);
   };
 
