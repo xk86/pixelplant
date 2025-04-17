@@ -186,49 +186,6 @@ function weighted_random(items, weights) {
   return items[i];
 }
 
-
-function compute() {
-  //  let end = "";
-  //  let stack = [];
-  //  turtle.facing = "N";
-  //  for(var i = 0; i <= s.length; i++) {
-  //    let c = s[i];
-  //
-  //    if(c === 'A') {
-  //      turtle.moveForward(2)
-  //      end = end.concat('AA');
-  //    }
-  //    else if (c === 'B') {
-  //      turtle.moveForward(2);
-  //      end = end.concat('A[B]B');
-  //    }
-  //    else if (c === 'C') {
-  //      turtle.moveForward(1);
-  //      turtle.color = rgba(0,128,0,1)
-  //      end = end.concat('BX')
-  //    }
-  //    else if (c === "X") {
-  //      turtle.goto(15,33);
-  //      end = end.concat('[AB]')
-  //    }
-  //    else if (c === "[") {
-  //      stack.push({x: turtle.x, y: turtle.y, facing: turtle.facing});
-  //      turtle.turn("L",1);
-  //      end += "["
-  //    }
-  //    else if (c === "]") {
-  //      let o = stack.pop();
-  //      turtle.x = o.x;
-  //      turtle.y = o.y;
-  //      turtle.facing = o.facing;
-  //
-  //      turtle.turn("R",1);
-  //      end += "]"
-  //    }
-  //  }
-  //  return end;
-}
-
 //const canvas: HTMLCanvasElement = document.getElementById('canvas');
 //const ctx = canvas.getContext('2d');
 const start_y = 256;
