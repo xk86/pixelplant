@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo } from "react";
 import ReactDOM from "react-dom/client";
 import { Turtle, drawOps, opDocs } from "./Turtle";
 import { IAlphabet, VariableProperties, CommandTuple, DrawCommandTuples, 
@@ -6,7 +6,10 @@ import { IAlphabet, VariableProperties, CommandTuple, DrawCommandTuples,
 
 import { prodAlphabet } from "./old_example_alphabets";
 
-import {Variables, SymbolBlock, Constants, Probs} from "./SymbolComponents";
+import { axiomAction, nameAction, variableAction, constantAction } from "./SymbolComponents/types";
+import { Variables } from "./SymbolComponents/Variables";
+import { Constants } from "./SymbolComponents/Constants";
+import { Probs } from "./SymbolComponents/Probs";
 
 import "./App.css";
 
@@ -56,49 +59,11 @@ interface AlphabetState {
   alphabet: IAlphabet;
 }
 
-// Various state element interfaces
-interface NameEl {
-  name: string;
-}
-interface AxiomEl {
-  axiom: string;
-}
-interface VarEl {
-  predecessor: string;
-  successor: string;
-  drawcmds: DrawCommandTuples;
-}
-interface ConstEl {
-  predecessor: string;
-  drawcmds: DrawCommandTuples;
-}
-interface ProbEl {
-  predecessor: string;
-  probs: any; // TODO
-}
-
-// Reducer action interfaces
-interface nameAction {
-  type: "name";
-  payload: NameEl;
-}
-interface axiomAction {
-  type: "axiom";
-  payload: AxiomEl;
-}
-interface variableAction {
-  type: "variable";
-  payload: VarEl;
-}
-interface constantAction {
-  type: 'constant';
-  payload: ConstEl;
-}
-
 interface loadAction {
   type: "load";
   payload: AlphabetState
 }
+
 interface resetAction {
   type: "reset";
 }
@@ -113,11 +78,10 @@ type AllAction = nameAction
 
 function alphabetReducer(state: AlphabetState, action: AllAction) {
 //  const newAlphabet = Object.assign({}, state.alphabet);
-  let na;
+  let newAlphabet;
   switch(action.type) {
       case 'variable':
-        console.log(511,action.payload);
-        na = {
+        newAlphabet = {
           alphabet: {
             ...state.alphabet,
             variables: {
@@ -126,9 +90,9 @@ function alphabetReducer(state: AlphabetState, action: AllAction) {
             }
           }
         }
-        return na;
+        return newAlphabet;
       case 'constant':
-        na = {
+        newAlphabet = {
           alphabet: {
             ...state.alphabet,
             constants: {
@@ -137,7 +101,7 @@ function alphabetReducer(state: AlphabetState, action: AllAction) {
             }
           }
         }
-        return na;
+        return newAlphabet;
       case 'name':
         return { alphabet:
           {...state.alphabet,
@@ -146,12 +110,11 @@ function alphabetReducer(state: AlphabetState, action: AllAction) {
         return { alphabet: {...state.alphabet,
           axiom: action.payload.axiom} }
       case 'load':
-        na = action.payload;
-        return na;
+        newAlphabet = action.payload;
+        return newAlphabet;
       case 'reset':
-        na = initAlphabetState({...state.alphabet});
-        console.log(526,na);
-        return na;
+        newAlphabet = initAlphabetState({...state.alphabet});
+        return newAlphabet;
   }
 }
 
@@ -241,7 +204,7 @@ interface ReducerState {
   alphabet: IAlphabet;
 }
 
-interface ReducerProps {
+export interface ReducerProps {
   state: ReducerState;
   dispatch: Function;
 }
