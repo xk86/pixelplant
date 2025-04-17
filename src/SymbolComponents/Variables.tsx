@@ -29,10 +29,10 @@ export function Variables({ state, dispatch }: ReducerProps) {
   }
 
   const addRow = () =>
-    setRows([...rows, { predecessor: '', successor: '', drawcmds: [] }])
+    setRows([...rows, { predecessor: '', successor: '', drawcmds: [['nop', 0]] }])
 
   const addDraw = (row: VariableElement, i: number) =>
-    handleChange(i, 'drawcmds', [...row.drawcmds, ['nop']])
+    handleChange(i, 'drawcmds', [...row.drawcmds, ['nop', 0]])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
