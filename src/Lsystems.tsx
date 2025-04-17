@@ -1,49 +1,5 @@
 import {Turtle, Color, clamp} from "./Turtle";
-
-// strong, discriminated symbol-entry types
-export interface BaseSymbolEntry {
-  id: string;
-  label?: string;
-}
-
-// a variable always has a successor string and draw commands
-export interface VariableEntry extends BaseSymbolEntry {
-  type: 'variable';
-  successor: string;
-  drawcmds: DrawCommandTuples;
-}
-
-// a constant has only draw commands (no successor)
-export interface ConstantEntry extends BaseSymbolEntry {
-  type: 'constant';
-  drawcmds: DrawCommandTuples;
-}
-
-// a probabilistic symbol has only branches (no direct draw commands)
-export interface ProbabilisticEntry extends BaseSymbolEntry {
-  type: 'probabilistic';
-  branches: ProbTuple[];
-}
-
-// union of all entries
-export type SymbolEntry = VariableEntry | ConstantEntry | ProbabilisticEntry;
-
-// collection shape for lists of entries
-export interface ListAlphabet {
-  name: string;
-  axiom: string;
-  variables: VariableEntry[];
-  constants: ConstantEntry[];
-  probs?: ProbabilisticEntry[];
-}
-
-export type SentenceSymbol = {
-  id: string
-  entry: SymbolEntry
-}
-
-export type Sentence = SentenceSymbol[]
-
+import { ListAlphabet } from "./SymbolComponents/types";
 
 
 export type CommandTuple = [string, number] | ["nop"];

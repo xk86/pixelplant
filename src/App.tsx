@@ -6,7 +6,12 @@ import { IAlphabet, VariableProperties, CommandTuple, DrawCommandTuples,
 
 import { prodAlphabet } from "./old_example_alphabets";
 
-import { axiomAction, nameAction, variableAction, constantAction } from "./SymbolComponents/types";
+import { axiomAction, nameAction, variableAction, 
+        constantAction, ProbabilisticEntry, 
+        ConstantEntry,
+        VariableEntry
+        
+        } from "./SymbolComponents/types";
 import { Variables } from "./SymbolComponents/Variables";
 import { Constants } from "./SymbolComponents/Constants";
 import { Probs } from "./SymbolComponents/Probs";
