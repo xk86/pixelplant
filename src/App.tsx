@@ -260,7 +260,7 @@ function Controls({ state, dispatch }: ReducerProps) {
   );
 }
 
-const curalpha = probAlphabet;
+//const curalpha = probAlphabet;
 //controls.render(<Alphabet alphabet={curalpha}/>)
 //drawMany(3, turtle, "y", applyRules, computeSentence, 6, curalpha);
 
