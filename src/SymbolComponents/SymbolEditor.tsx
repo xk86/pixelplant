@@ -21,7 +21,7 @@ export function SymbolEditor<T extends BaseSymbolEntry & { type: string }>({
     onChange(next)
   }
   return (
-    <div className="symbol‑editor">
+    <div className="symbol-editor">
       {entries.map((entry, i) =>
         <div key={entry.id || `${i}-${entry.type}`} className="entry-row flex items-center gap-2">
           {renderFields(entry, i, (k, v) => updateAt(i, { [k]: v } as Partial<T>))}

@@ -9,7 +9,8 @@ export function useAlphabetEditor<E, P>(
   dispatch: (action: { type: string; payload: P }) => void
 ): [E[], (updated: E[]) => void] {
   // @ts-ignore: we just grab state.alphabet[section], TS can’t narrow this easily
-  const mapData = (state.alphabet as any)[config.section];
+  const raw = (state.alphabet as any)[config.section];
+  const mapData = raw || {};
   return useSymbolEditor<E, P>(
     mapData,
     config.actionType,

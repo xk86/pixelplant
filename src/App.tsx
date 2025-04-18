@@ -4,7 +4,7 @@ import { Turtle, drawOps, opDocs } from "./Turtle";
 import { IAlphabet, VariableProperties, CommandTuple, DrawCommandTuples, 
          ProbTuple, applyRules, listToMapAlpha, computeSentence} from "./Lsystems";
 
-import { prodAlphabet } from "./old_example_alphabets";
+import { prodAlphabet, binaryTreeAlphabet } from "./old_example_alphabets";
 
 import { axiomAction, nameAction, 
          variableAction, constantAction, probAction, 
@@ -174,9 +174,10 @@ function Axiom(props) {
 
   const handleChange = (event) => {
     event.preventDefault();
-    console.log(event.target.value)
-    setInputText(event.target.value)
-    props.dispatch({type: 'axiom', payload: {axiom: inputText}})
+    const newAxiom = event.target.value;
+    console.log(newAxiom);
+    setInputText(newAxiom);
+    props.dispatch({type: 'axiom', payload: {axiom: newAxiom}});
   }
   const submit = (e) => {
     e.preventDefault();
@@ -193,27 +194,6 @@ function Axiom(props) {
     </div>
   );
 }
-
-//function Variables(props) {
-//  let ruleNames = Object.keys(props.alphabet.variables);
-//  let rules = Object.values(props.alphabet.variables);
-//  let rewrite = [];
-//  for (let i = 0; i<rules.length; i++) {
-//    rewrite = rewrite.concat(rules[i][0]);
-//  }
-//  let drawRules = [];
-//  for (let i = 0; i<rules.length; i++) {
-//    drawRules = drawRules.concat(rules[i][1]);
-//  }
-//  console.log(ruleNames, rewrite);
-//
-//  let nameListItems = ruleNames.map((rule) =>
-//    <li key={rule}>
-//      {rule}
-//    </li>
-//  );
-//  return (<ol>{nameListItems}</ol>);
-//}
 
 interface EditorState {
   name: string
@@ -400,8 +380,7 @@ function App() {
   //  const [currentAlphabet, setCurrentAlphabet] = React.useState(exampleAlphabet);
   const [state, dispatch] = React.useReducer(
     alphabetReducer,
-    prodAlphabet,
-    //binaryTreeAlphabet,
+    binaryTreeAlphabet,
     initAlphabetState
   );
   const [drawSettings, setDrawSettings] = React.useState({width: 150, height: 150, scale: 4, iters: 5, count: 1})
@@ -410,9 +389,9 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="container">
-        <DrawControls settings={drawSettings} setFn={setDrawSettings} dispatch={dispatch}/>
-        <Canvas width={drawSettings.width} height={drawSettings.height} scale={drawSettings.scale} iters={drawSettings.iters} state={state} />
         <Controls state={state} dispatch={dispatch} />
+        <Canvas width={drawSettings.width} height={drawSettings.height} scale={drawSettings.scale} iters={drawSettings.iters} state={state} />
+        <DrawControls settings={drawSettings} setFn={setDrawSettings} dispatch={dispatch}/>
         <ImpExport state={state} dispatch={dispatch} />
       </div>
       <div className="documentation">
