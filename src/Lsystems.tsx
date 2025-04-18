@@ -1,6 +1,7 @@
+// src/Lsystems.tsx
+// Code for evaluating/rewriting and drawing Lsystem rules given an alphabet of rules and an axiom.
 import {Turtle, Color, clamp} from "./Turtle";
 import { ListAlphabet } from "./SymbolComponents/types";
-
 
 export type CommandTuple = [string, number] | ["nop"];
 export type DrawCommandTuples = CommandTuple[];
@@ -43,9 +44,9 @@ function mapToListAlpha(alpha: IAlphabet): EditorState {
     constants: Object.entries(alpha.constants).map(
       ([id, drawcmds]) => ({ id, type:'constant', drawcmds })
     ),
-    probabilistics: alpha.probs
+    probs: alpha.probs
       ? Object.entries(alpha.probs).map(
-          ([id, branches]) => ({ id, type:'probabilistic', branches })
+          ([id, branches]) => ({ id, type:'prob', branches })
         )
       : []
   }

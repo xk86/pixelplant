@@ -1,3 +1,5 @@
+// src/SymbolComponents/types.tsx
+// Types and interfaces for representing state in our Symbol Rules
 import { Turtle, drawOps } from "../Turtle";
 import { DrawCommandTuples, ProbTuple } from "../Lsystems";
 import React from "react";
@@ -32,7 +34,7 @@ interface ConstElement {
 }
 interface ProbElement {
   predecessor: string;
-  probs: any; // TODO
+  branches: ProbTuple[]; // TODO
 }
 
 // Reducer action interfaces
@@ -56,6 +58,11 @@ export interface constantAction {
   payload: ConstElement;
 }
 
+export interface probAction {
+  type: 'prob';
+  payload: ProbElement;
+}
+
 // Types for the List-based lsystems used by the UI (for now)
 export interface BaseSymbolEntry {
   id: string;
@@ -77,7 +84,7 @@ export interface ConstantEntry extends BaseSymbolEntry {
 
 // a probabilistic symbol has only branches (no direct draw commands)
 export interface ProbabilisticEntry extends BaseSymbolEntry {
-  type: 'probabilistic';
+  type: 'prob';
   branches: ProbTuple[];
 }
 

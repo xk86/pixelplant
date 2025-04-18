@@ -1,3 +1,5 @@
+// src/SymbolComponents/SymbolEditor.tsx
+// Defines basic outline for the different types of symbol editors.
 import { BaseSymbolEntry } from "./types"
 
 interface SymbolEditorProps<T extends BaseSymbolEntry & { type: string }> {

@@ -6,11 +6,9 @@ import { IAlphabet, VariableProperties, CommandTuple, DrawCommandTuples,
 
 import { prodAlphabet } from "./old_example_alphabets";
 
-import { axiomAction, nameAction, variableAction, 
-        constantAction, ProbabilisticEntry, 
-        ConstantEntry,
-        VariableEntry
-        
+import { axiomAction, nameAction, 
+         variableAction, constantAction, probAction, 
+         ProbabilisticEntry, ConstantEntry, VariableEntry
         } from "./SymbolComponents/types";
 import { Variables } from "./SymbolComponents/Variables";
 import { Constants } from "./SymbolComponents/Constants";
@@ -78,6 +76,7 @@ type AllAction = nameAction
                | axiomAction
                | variableAction
                | constantAction
+               | probAction
                | loadAction
                | resetAction;
 
@@ -103,6 +102,17 @@ function alphabetReducer(state: AlphabetState, action: AllAction) {
             constants: {
               ...state.alphabet.constants,
               [action.payload.predecessor]: action.payload.drawcmds
+            }
+          }
+        }
+        return newAlphabet;
+      case 'prob': 
+        newAlphabet = {
+          alphabet: {
+            ...state.alphabet,
+            probs: {
+              ...state.alphabet.probs,
+              [action.payload.predecessor]: action.payload.branches
             }
           }
         }
@@ -205,7 +215,15 @@ function Axiom(props) {
 //  return (<ol>{nameListItems}</ol>);
 //}
 
-interface ReducerState {
+interface EditorState {
+  name: string
+  axiom: string[]
+  variables: VariableEntry[]
+  constants: ConstantEntry[]
+  probabilistics: ProbabilisticEntry[]
+}
+
+export interface ReducerState {
   alphabet: IAlphabet;
 }
 
