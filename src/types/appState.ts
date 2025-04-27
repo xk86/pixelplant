@@ -1,0 +1,64 @@
+import { DrawCommandTuples, IAlphabet } from "./lsystems";
+// Basic state interface
+export interface AlphabetState {
+  alphabet: IAlphabet;
+}
+
+// Various state element interfaces
+interface NameEl {
+  name: string;
+}
+
+interface AxiomEl {
+  axiom: string;
+}
+
+export interface VarEl {
+  predecessor: string;
+  successor: string;
+  drawcmds: DrawCommandTuples;
+}
+
+export interface ConstEl {
+  predecessor: string;
+  drawcmds: DrawCommandTuples;
+}
+
+export interface ProbEl {
+  predecessor: string;
+  probs: any; // TODO
+}
+
+// Reducer action interfaces
+interface nameAction {
+  type: "name";
+  payload: NameEl;
+}
+interface axiomAction {
+  type: "axiom";
+  payload: AxiomEl;
+}
+interface variableAction {
+  type: "variable";
+  payload: VarEl;
+}
+interface constantAction {
+  type: 'constant';
+  payload: ConstEl;
+}
+
+interface loadAction {
+  type: "load";
+  payload: AlphabetState
+}
+interface resetAction {
+  type: "reset";
+}
+
+// Putting it all together...
+export type AllAction = nameAction
+                      | axiomAction
+                      | variableAction
+                      | constantAction
+                      | loadAction
+                      | resetAction;

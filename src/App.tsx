@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
 import ReactDOM from "react-dom/client";
 import { Turtle, drawOps, opDocs } from "./Turtle";
-import { fernAlphabet, exampleAlphabet, binaryTreeAlphabet, probAlphabet, dragonCurveAlphabet, prodAlphabet,
-         IAlphabet, VariableProperties, CommandTuple, DrawCommandTuples, ProbTuple, applyRules, computeSentence} from "./Lsystems"
+import { IAlphabet, ProbTuple, VariableProperties, DrawCommandTuples, CommandTuple } from "./types/lsystems";
+import { AlphabetState, AllAction, VarEl, ConstEl } from "./types/appState";
 import "./App.css";
 
 //@ts-ignore
@@ -46,65 +46,6 @@ function initAlphabetState(alphabet:IAlphabet) {
   return { alphabet: alphabet };
 }
 
-// Basic state interface
-interface AlphabetState {
-  alphabet: IAlphabet;
-}
-
-// Various state element interfaces
-interface NameEl {
-  name: string;
-}
-interface AxiomEl {
-  axiom: string;
-}
-interface VarEl {
-  predecessor: string;
-  successor: string;
-  drawcmds: DrawCommandTuples;
-}
-interface ConstEl {
-  predecessor: string;
-  drawcmds: DrawCommandTuples;
-}
-interface ProbEl {
-  predecessor: string;
-  probs: any; // TODO
-}
-
-// Reducer action interfaces
-interface nameAction {
-  type: "name";
-  payload: NameEl;
-}
-interface axiomAction {
-  type: "axiom";
-  payload: AxiomEl;
-}
-interface variableAction {
-  type: "variable";
-  payload: VarEl;
-}
-interface constantAction {
-  type: 'constant';
-  payload: ConstEl;
-}
-
-interface loadAction {
-  type: "load";
-  payload: AlphabetState
-}
-interface resetAction {
-  type: "reset";
-}
-
-// Putting it all together...
-type AllAction = nameAction
-               | axiomAction
-               | variableAction
-               | constantAction
-               | loadAction
-               | resetAction;
 
 function alphabetReducer(state: AlphabetState, action: AllAction) {
 //  const newAlphabet = Object.assign({}, state.alphabet);

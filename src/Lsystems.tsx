@@ -1,5 +1,5 @@
 import {Turtle, Color, clamp} from "./Turtle";
-
+import { IAlphabet } from "./types/lsystems";
 
 export function applyRules(t, sentence, fn, n, alphabet) {
   let end = sentence;
@@ -41,20 +41,7 @@ export function computeSentence(s, a) {
   }
   return end;
 }
-export type CommandTuple = [string, number] | ["nop"];
-export type DrawCommandTuples = CommandTuple[];
-export type VariableProperties = [string, DrawCommandTuples];
-export type Variable = { [predecessor: string]: VariableProperties };
-export type Constant = { [name: string]: DrawCommandTuples };
-export type ProbTuple = [string, number];
-export type Prob = { [name: string]: ProbTuple[] };
-export interface IAlphabet {
-  name: string;
-  axiom: string;
-  variables: Variable;
-  constants: Constant;
-  probs?: Prob;
-}
+
 export const exampleAlphabet: IAlphabet = {
   // Fields: name, axiom, variables, constants, probs
   name: "Example/Documentation Alphabet",
