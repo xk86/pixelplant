@@ -1,5 +1,5 @@
 import {Turtle, Color, clamp} from "./Turtle";
-import { IAlphabet } from "./types/lsystems";
+import { IAlphabet } from "../types/lsystems";
 
 export function applyRules(t, sentence, fn, n, alphabet) {
   let end = sentence;
