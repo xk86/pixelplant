@@ -1,8 +1,15 @@
 import React, { ReactNode } from "react";
 import ReactDOM from "react-dom/client";
+
+// Types
+import { IAlphabet, ProbTuple, VariableProperties,
+         DrawCommandTuples, CommandTuple } from "./types/lsystems";
+import { AlphabetState, AllAction, VarEl, ConstEl, AppReducerProps, AppReducerState } from "./types/appState";
+
+// Engine
 import { Turtle, drawOps, opDocs } from "./engine/Turtle";
-import { IAlphabet, ProbTuple, VariableProperties, DrawCommandTuples, CommandTuple } from "./types/lsystems";
-import { AlphabetState, AllAction, VarEl, ConstEl } from "./types/appState";
+
+// Style
 import "./App.css";
 
 //@ts-ignore
@@ -172,16 +179,6 @@ function Axiom(props) {
 //  );
 //  return (<ol>{nameListItems}</ol>);
 //}
-
-interface AppReducerState {
-  alphabet: IAlphabet;
-}
-
-interface AppReducerProps {
-  state: AppReducerState;
-  dispatch: Function;
-}
-
 
 function Controls({ state, dispatch }: AppReducerProps) {
   //  console.log(alphabet);

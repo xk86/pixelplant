@@ -62,3 +62,12 @@ export type AllAction = nameAction
                       | constantAction
                       | loadAction
                       | resetAction;
+
+export interface AppReducerState {
+  alphabet: IAlphabet;
+}
+
+export interface AppReducerProps {
+  state: AppReducerState;
+  dispatch: Function;
+}
