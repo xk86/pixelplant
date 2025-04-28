@@ -38,7 +38,7 @@ interface CanvasProps {
   height: number;
   scale: number;
   iters: number;
-  state: ReducerState;
+  state: AppReducerState;
 }
 
 
@@ -269,7 +269,7 @@ function CommandTupleInput({value, cmds}: {value: CommandTuple; cmds:string[]}):
 }
 
 
-function Variables({ state, dispatch }: ReducerProps) {
+function Variables({ state, dispatch }: AppReducerProps) {
   const alphabet = state.alphabet;
   const populateFields = () => {
     let a:VarEl[] = [];
@@ -380,7 +380,7 @@ function Variables({ state, dispatch }: ReducerProps) {
   );
 }
 
-function Constants({ state, dispatch }: ReducerProps) {
+function Constants({ state, dispatch }: AppReducerProps) {
   const alphabet = state.alphabet;
   const populateFields = () => {
     let a: ConstEl[] = [];
@@ -472,7 +472,7 @@ function Constants({ state, dispatch }: ReducerProps) {
   );
 }
 
-function Probs({ state, dispatch }: ReducerProps) {
+function Probs({ state, dispatch }: AppReducerProps) {
   type ProbEl = [string, ProbTuple[]];
   const alphabet = state.alphabet;
   const populateFields = () => {
@@ -628,7 +628,7 @@ function DrawControls({settings, setFn, dispatch}) {
 
 }
 
-function ImpExport({state, dispatch}: ReducerProps) {
+function ImpExport({state, dispatch}: AppReducerProps) {
   const [inputValue, setInputValue] = React.useState(btoa(JSON.stringify({...state})));
   function exp() {
     setInputValue(btoa(JSON.stringify({...state})))
