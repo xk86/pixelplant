@@ -12,9 +12,6 @@ import { Turtle, drawOps, opDocs } from "./engine/Turtle";
 // Style
 import "./App.css";
 
-//@ts-ignore
-//const controls = ReactDOM.createRoot(document.getElementById("controls"));
-
 class ErrorBoundary extends React.Component<
   { children: ReactNode },
   { hasError: boolean }
@@ -55,7 +52,6 @@ function initAlphabetState(alphabet:IAlphabet) {
 
 
 function alphabetReducer(state: AlphabetState, action: AllAction) {
-//  const newAlphabet = Object.assign({}, state.alphabet);
   let na;
   switch(action.type) {
       case 'variable':
@@ -97,11 +93,6 @@ function alphabetReducer(state: AlphabetState, action: AllAction) {
         return na;
   }
 }
-
-//turtle.moveForward(1);
-//turtle.x = 63;
-//turtle.y = 63;
-//applyRules("B", compute, 4);
 
 function Name(props) {
   let t = {...props.alphabet}.name
@@ -158,27 +149,6 @@ function Axiom(props) {
     </div>
   );
 }
-
-//function Variables(props) {
-//  let ruleNames = Object.keys(props.alphabet.variables);
-//  let rules = Object.values(props.alphabet.variables);
-//  let rewrite = [];
-//  for (let i = 0; i<rules.length; i++) {
-//    rewrite = rewrite.concat(rules[i][0]);
-//  }
-//  let drawRules = [];
-//  for (let i = 0; i<rules.length; i++) {
-//    drawRules = drawRules.concat(rules[i][1]);
-//  }
-//  console.log(ruleNames, rewrite);
-//
-//  let nameListItems = ruleNames.map((rule) =>
-//    <li key={rule}>
-//      {rule}
-//    </li>
-//  );
-//  return (<ol>{nameListItems}</ol>);
-//}
 
 function Controls({ state, dispatch }: AppReducerProps) {
   //  console.log(alphabet);
