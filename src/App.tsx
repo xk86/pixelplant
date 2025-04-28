@@ -2,27 +2,26 @@ import React, { ReactNode } from "react";
 import ReactDOM from "react-dom/client";
 
 // Types
-import { IAlphabet, ProbTuple, VariableProperties,
-         DrawCommandTuples, CommandTuple } from "./types/Lsystems";
-import { AlphabetState, AllAction, VarEl, ConstEl, AppReducerProps, AppReducerState } from "./types/AppState";
+import { CommandTuple, DrawCommandTuples } from "./types/Lsystems";
+import { AppReducerProps } from "./types/AppState";
 
 // Engine
-import { Turtle, drawOps, opDocs } from "./engine/turtle";
-import { applyRules, computeSentence } from "./engine/lsystems";
+import { drawOps, opDocs } from "./engine/turtle";
 
 // Controls
-import { Constants } from "./components/Controls/Constants";
-import { Variables } from "./components/Controls/Variables";
-import { Probs } from "./components/Controls/Probs"; 
+import { DrawControls } from "./components/Controls/DrawControls";
+import { Controls } from "./components/Controls/Editor";
+import { Canvas } from "./components/Canvas/Canvas";
+
+// Reducers
+import { alphabetReducer, initAlphabetState } from "./reducers/alphabetReducer";
 
 // Example/Default alphabet
 import { probAlphabet, prodAlphabet } from "./examples/exampleAlphabets";
 
 // Style
 import "./App.css";
-import { alphabetReducer, initAlphabetState } from "./reducers/alphabetReducer";
-import { Controls } from "./components/Controls/Editor";
-import { Canvas } from "./components/Canvas/Canvas";
+
 
 class ErrorBoundary extends React.Component<
   { children: ReactNode },
@@ -50,12 +49,9 @@ class ErrorBoundary extends React.Component<
   }
 }
 
-
 const curalpha = probAlphabet;
 //controls.render(<Alphabet alphabet={curalpha}/>)
 //drawMany(3, turtle, "y", applyRules, computeSentence, 6, curalpha);
-
-
 
 function drawCmdsToString(t: DrawCommandTuples) {
   let retstr = "";
@@ -85,56 +81,6 @@ function CommandTupleInput({value, cmds}: {value: CommandTuple; cmds:string[]}):
   ))
 }
 
-interface DrawSettings {
-  width: number;
-  height: number;
-  scale: number;
-  iters: number;
-  count: number;
-}
-
-function DrawControls({settings, setFn, dispatch}) {
-  let localSettings = {...settings}
-
-  const handleFormChange = (index, event) => {
-    console.log(508,event.target.value)
-   if(index > 1) {
-      dispatch({type: "reset"})
-      localSettings = {...localSettings, [event.target.name]: parseInt(event.target.value)};
-    } else {
-      localSettings = {...localSettings, [event.target.name]: parseInt(event.target.value)};
-    }
-      setFn({...settings, [event.target.name]: parseInt(event.target.value)})
-
-  //  console.log(509,setFn({...settings, [event.target.name]: settings[event.target.name]}));
- //   console.log(510,settings)
-  }
-  const submit = (e) => {
-    e.preventDefault();
-  }
-
-  return(
-    <div className="drawControls">
-      <form onSubmit={submit}>
-        <h3>Draw Settings</h3>
-        {Object.keys(settings).map((input, index) => {
-          return(<div key={index} className="drawSettings">
-           {input}:
-           <input name={input}
-           placeholder={input}
-           type="number"
-           value={settings[input]}
-           onChange={(event) => handleFormChange(index, event)}
-           />
-          <br />
-          </div>);
-        })}
-      </form>
-
-  </div> );
-
-
-}
 
 function ImpExport({state, dispatch}: AppReducerProps) {
   const [inputValue, setInputValue] = React.useState(btoa(JSON.stringify({...state})));
