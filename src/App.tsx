@@ -21,6 +21,8 @@ import { probAlphabet, prodAlphabet } from "./examples/exampleAlphabets";
 // Style
 import "./App.css";
 import { alphabetReducer, initAlphabetState } from "./reducers/alphabetReducer";
+import { Controls } from "./components/Controls/Editor";
+import { Canvas } from "./components/Canvas/Canvas";
 
 class ErrorBoundary extends React.Component<
   { children: ReactNode },
@@ -47,125 +49,12 @@ class ErrorBoundary extends React.Component<
     return this.props.children;
   }
 }
-interface CanvasProps {
-  width: number;
-  height: number;
-  scale: number;
-  iters: number;
-  state: AppReducerState;
-}
 
-function Name(props) {
-  let t = {...props.alphabet}.name
-  let [inputText, setInputText] = React.useState(t)
-  console.log(inputText)
-
-  const handleChange = (event) => {
-    event.preventDefault();
-    console.log(event.target.value)
-    setInputText(event.target.value)
-    props.dispatch({type: 'name', payload: {name: inputText}})
-  }
-  const submit = (e) => {
-    e.preventDefault();
-    props.dispatch({
-        type: "name",
-        payload: {name: inputText},
-      });
-    props.dispatch({type: "reset", payload: {alphabet: props.alphabet}});
-    }
-
-  return (
-    <div>
-      <h1>{inputText}</h1>
-      <h2>{props.alphabet.name}</h2>
-      <form onSubmit={submit}><input type="text" value={inputText} onChange={(e)=>handleChange(e)}></input></form>
-    </div>
-  );
-}
-
-function Axiom(props) {
-  let t = {...props.alphabet}.axiom
-  let [inputText, setInputText] = React.useState(t)
-  console.log(inputText)
-
-  const handleChange = (event) => {
-    event.preventDefault();
-    console.log(event.target.value)
-    setInputText(event.target.value)
-    props.dispatch({type: 'axiom', payload: {axiom: inputText}})
-  }
-  const submit = (e) => {
-    e.preventDefault();
-    props.dispatch({
-        type: "axiom",
-        payload: {axiom: inputText},
-      });
-    props.dispatch({type: "reset", payload: {alphabet: props.alphabet}});
-    }
-
-  return (
-    <div>
-      <form onSubmit={submit}><input type="text" value={inputText} onChange={(e)=>handleChange(e)}></input></form>
-    </div>
-  );
-}
-
-function Controls({ state, dispatch }: AppReducerProps) {
-  //  console.log(alphabet);
-  return (
-    <div>
-      <Name alphabet={state.alphabet} dispatch={dispatch}/>
-      <Axiom alphabet={state.alphabet} dispatch={dispatch}/>
-      <Variables state={state} dispatch={dispatch} />
-      <Constants state={state} dispatch={dispatch}/>
-      <Probs state={state} dispatch={dispatch} />
-    </div>
-  );
-}
 
 const curalpha = probAlphabet;
 //controls.render(<Alphabet alphabet={curalpha}/>)
 //drawMany(3, turtle, "y", applyRules, computeSentence, 6, curalpha);
 
-const Canvas = (props: CanvasProps) => {
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const defaultColor = { r: 90, g: 194, b: 90, a: 0.6 };
-  console.log(props);
-  const alphabet = props.state.alphabet;
-
-  React.useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
-    const context = canvas.getContext("2d");
-    if (!context) {
-      return;
-    }
-    context.clearRect(0,0,props.width, props.height);
-    const turtle = new Turtle(
-      props.width / 2,
-      props.height,
-      defaultColor,
-      context
-    );
-    applyRules(turtle, alphabet.axiom, computeSentence, props.iters, alphabet);
-  }, [props.iters, props.state.alphabet]);
-
-  return (
-    <canvas
-      width={props.width}
-      height={props.height}
-      style={{
-        margin: 8,
-        width: props.width * props.scale,
-        height: props.height * props.scale,
-      }}
-      ref={canvasRef}
-    />
-  );
-};
 
 
 function drawCmdsToString(t: DrawCommandTuples) {
@@ -269,7 +158,6 @@ function ImpExport({state, dispatch}: AppReducerProps) {
     <button onClick={imp}>Import Plant Settings</button>
   </div>)
 }
-
 
 function App() {
   //  const [currentAlphabet, setCurrentAlphabet] = React.useState(exampleAlphabet);
