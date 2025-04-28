@@ -173,17 +173,17 @@ function Axiom(props) {
 //  return (<ol>{nameListItems}</ol>);
 //}
 
-interface ReducerState {
+interface AppReducerState {
   alphabet: IAlphabet;
 }
 
-interface ReducerProps {
-  state: ReducerState;
+interface AppReducerProps {
+  state: AppReducerState;
   dispatch: Function;
 }
 
 
-function Controls({ state, dispatch }: ReducerProps) {
+function Controls({ state, dispatch }: AppReducerProps) {
   //  console.log(alphabet);
   return (
     <div>
