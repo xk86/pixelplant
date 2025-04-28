@@ -20,6 +20,7 @@ import { probAlphabet, prodAlphabet } from "./examples/exampleAlphabets";
 
 // Style
 import "./App.css";
+import { alphabetReducer, initAlphabetState } from "./reducers/alphabetReducer";
 
 class ErrorBoundary extends React.Component<
   { children: ReactNode },
@@ -52,55 +53,6 @@ interface CanvasProps {
   scale: number;
   iters: number;
   state: AppReducerState;
-}
-
-
-function initAlphabetState(alphabet:IAlphabet) {
-  return { alphabet: alphabet };
-}
-
-
-function alphabetReducer(state: AlphabetState, action: AllAction) {
-  let na;
-  switch(action.type) {
-      case 'variable':
-        console.log(511,action.payload);
-        na = {
-          alphabet: {
-            ...state.alphabet,
-            variables: {
-              ...state.alphabet.variables,
-              [action.payload.predecessor]: [action.payload.successor, action.payload.drawcmds]
-            }
-          }
-        }
-        return na;
-      case 'constant':
-        na = {
-          alphabet: {
-            ...state.alphabet,
-            constants: {
-              ...state.alphabet.constants,
-              [action.payload.predecessor]: action.payload.drawcmds
-            }
-          }
-        }
-        return na;
-      case 'name':
-        return { alphabet:
-          {...state.alphabet,
-           name: action.payload.name} }
-      case 'axiom':
-        return { alphabet: {...state.alphabet,
-          axiom: action.payload.axiom} }
-      case 'load':
-        na = action.payload;
-        return na;
-      case 'reset':
-        na = initAlphabetState({...state.alphabet});
-        console.log(526,na);
-        return na;
-  }
 }
 
 function Name(props) {
