@@ -8,9 +8,10 @@ import { AlphabetState, AllAction, VarEl, ConstEl, AppReducerProps, AppReducerSt
 
 // Engine
 import { Turtle, drawOps, opDocs } from "./engine/Turtle";
+import { applyRules, computeSentence } from "./engine/Lsystems";
 
 // Example/Default alphabet
-import { prodAlphabet } from "./examples/exampleAlphabets";
+import { probAlphabet, prodAlphabet } from "./examples/exampleAlphabets";
 
 // Style
 import "./App.css";
