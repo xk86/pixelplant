@@ -3,12 +3,12 @@ import ReactDOM from "react-dom/client";
 
 // Types
 import { IAlphabet, ProbTuple, VariableProperties,
-         DrawCommandTuples, CommandTuple } from "./types/lsystems";
-import { AlphabetState, AllAction, VarEl, ConstEl, AppReducerProps, AppReducerState } from "./types/appState";
+         DrawCommandTuples, CommandTuple } from "./types/Lsystems";
+import { AlphabetState, AllAction, VarEl, ConstEl, AppReducerProps, AppReducerState } from "./types/AppState";
 
 // Engine
-import { Turtle, drawOps, opDocs } from "./engine/Turtle";
-import { applyRules, computeSentence } from "./engine/Lsystems";
+import { Turtle, drawOps, opDocs } from "./engine/turtle";
+import { applyRules, computeSentence } from "./engine/lsystems";
 
 // Example/Default alphabet
 import { probAlphabet, prodAlphabet } from "./examples/exampleAlphabets";

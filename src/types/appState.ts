@@ -1,4 +1,4 @@
-import { DrawCommandTuples, IAlphabet } from "./lsystems";
+import { DrawCommandTuples, IAlphabet } from "./Lsystems";
 // Basic state interface
 export interface AlphabetState {
   alphabet: IAlphabet;

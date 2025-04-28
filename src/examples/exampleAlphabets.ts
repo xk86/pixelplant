@@ -1,4 +1,4 @@
-import { IAlphabet } from "../types/lsystems";
+import { IAlphabet } from "../types/Lsystems";
 
 export const exampleAlphabet: IAlphabet = {
   // Fields: name, axiom, variables, constants, probs
