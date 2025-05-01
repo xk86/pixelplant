@@ -5,3 +5,9 @@ export interface DrawSettings {
   iters: number;
   count: number;
 }
+
+export interface DrawControlProps {
+  settings: DrawSettings;
+  setFn: (settings: DrawSettings) => void;
+  dispatch: (action: { type: string }) => void;
+}

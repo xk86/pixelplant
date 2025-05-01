@@ -1,7 +1,10 @@
-export function DrawControls({ settings, setFn, dispatch }) {
+import { ChangeEvent } from "react";
+import { DrawControlProps } from "../../types/DrawControls";
+
+export function DrawControls({ settings, setFn, dispatch }: DrawControlProps) {
   let localSettings = { ...settings };
 
-  const handleFormChange = (index, event) => {
+  const handleFormChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
     console.log(508, event.target.value);
     if (index > 1) {
       dispatch({ type: "reset" });
@@ -14,7 +17,7 @@ export function DrawControls({ settings, setFn, dispatch }) {
     //  console.log(509,setFn({...settings, [event.target.name]: settings[event.target.name]}));
     //   console.log(510,settings)
   };
-  const submit = (e) => {
+  const submit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
   };
 
