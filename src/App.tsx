@@ -1,8 +1,5 @@
 import React, { ReactNode } from "react";
 
-// Types
-import { CommandTuple, DrawCommandTuples } from "./types/Lsystems";
-
 // Engine
 import { drawOps, opDocs } from "./engine/turtle";
 
@@ -16,7 +13,7 @@ import { ImpExport } from "./components/Controls/ImpExp";
 import { alphabetReducer, initAlphabetState } from "./reducers/alphabetReducer";
 
 // Example/Default alphabet
-import { probAlphabet, prodAlphabet } from "./examples/exampleAlphabets";
+import { prodAlphabet } from "./examples/exampleAlphabets";
 
 // Style
 import "./App.css";
