@@ -6,7 +6,7 @@ export function initAlphabetState(alphabet: IAlphabet) {
 }
 
 export function alphabetReducer(state: AlphabetState, action: AllAction) {
-  let na;
+  let na: AlphabetState;
   switch (action.type) {
     case "variable":
       console.log("var alphaReducer", action.payload);

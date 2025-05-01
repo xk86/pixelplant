@@ -1,15 +1,9 @@
-import {Turtle, Color, clamp} from "./turtle";
+import { Turtle, Color, clamp } from "./turtle";
 import { IAlphabet } from "../types/Lsystems";
 
-export function applyRules(
-  turtle: Turtle,
-  sentence: string,
-  fn,
-  n: number,
-  alphabet: IAlphabet)
-{
+export function applyRules(turtle: Turtle, sentence: string, fn, n: number, alphabet: IAlphabet) {
   let end = sentence;
-  for (var i = 1; i <= n; i++) {
+  for (let i = 1; i <= n; i++) {
     //console.log(end);
     end = fn(end, alphabet);
     if (i == n) {
@@ -48,7 +42,7 @@ export function computeSentence(s, a) {
   return end;
 }
 
-export var drawCommands:[string, number][] = []
+export var drawCommands: [string, number][] = [];
 
 function draw(s: string, t: Turtle, a: IAlphabet) {
   interface StackFrame {
@@ -57,7 +51,7 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
     facing: string;
     color: Color;
   }
-  let stack:StackFrame[];
+  let stack: StackFrame[];
   let va = a.variables;
   let cn = a.constants;
   let pr = a.probs;
@@ -93,7 +87,7 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
         verbs[verb](arg);
       }
     } else if (va[c] != undefined) {
-//      console.log(280, va[c])
+      //      console.log(280, va[c])
       for (let i = 0; i < va[c][1].length; i++) {
         let [verb, arg] = va[c][1][i];
         verbs[verb](arg);
@@ -106,7 +100,7 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
 
 function weighted_random(items, weights) {
   // https://stackoverflow.com/questions/43566019/how-to-choose-a-weighted-random-array-element-in-javascript
-  var i;
+  let i;
 
   for (i = 0; i < weights.length; i++) weights[i] += weights[i - 1] || 0;
 
@@ -117,12 +111,11 @@ function weighted_random(items, weights) {
   return items[i];
 }
 
-
 function compute() {
   //  let end = "";
   //  let stack = [];
   //  turtle.facing = "N";
-  //  for(var i = 0; i <= s.length; i++) {
+  //  for(let i = 0; i <= s.length; i++) {
   //    let c = s[i];
   //
   //    if(c === 'A') {

@@ -76,7 +76,7 @@ class Turtle {
         break;
         
       case "NNE":
-        for(var i = 0; i < n/2; i++) {
+        for(let i = 0; i < n/2; i++) {
           this.move("NE",1);
           this.move("N",1);
         }
@@ -85,7 +85,7 @@ class Turtle {
         
       case "NE": 
         var pen = this.penDown;
-        for(var i = 0; i < n; i++) {
+        for(let i = 0; i < n; i++) {
           this.penDown = false;
           this.move("N",1);
           this.penDown = pen;
@@ -94,7 +94,7 @@ class Turtle {
         this.facing = "NE";
         break;
       case "ENE":
-        for(var i = 0; i < n/2; i++) {
+        for(let i = 0; i < n/2; i++) {
           this.move("NE",1);
           this.move("E",1);
         }
@@ -111,7 +111,7 @@ class Turtle {
         break;
         
       case "ESE":
-        for(var i = 0; i < n/2; i++) {
+        for(let i = 0; i < n/2; i++) {
           this.move("SE",1);
           this.move("E",1);
         }
@@ -120,7 +120,7 @@ class Turtle {
         
       case "SE":
         var pen = this.penDown;
-        for(var i = 0; i < n; i++) {
+        for(let i = 0; i < n; i++) {
           this.penDown = false;
           this.move("S",1);
           this.penDown = pen;
@@ -130,7 +130,7 @@ class Turtle {
         break;
         
       case "SSE":
-        for(var i = 0; i < n/2; i++) {
+        for(let i = 0; i < n/2; i++) {
           this.move("SE",1);
           this.move("S",1);
         }
@@ -146,7 +146,7 @@ class Turtle {
         break;
         
       case "SSW":
-        for(var i = 0; i < n/2; i++) {
+        for(let i = 0; i < n/2; i++) {
           this.move("SW",1);
           this.move("S",1);
         }
@@ -155,7 +155,7 @@ class Turtle {
         
       case "SW": 
         var pen = this.penDown;
-        for(var i = 0; i < n; i++) {
+        for(let i = 0; i < n; i++) {
           this.penDown = false;
           this.move("S",1);
           this.penDown = pen;
@@ -164,7 +164,7 @@ class Turtle {
         this.facing = "SW";
         break;
       case "WSW":
-        for(var i = 0; i < n/2; i++) {
+        for(let i = 0; i < n/2; i++) {
           this.move("SW",1);
           this.move("W",1);
         }
@@ -180,7 +180,7 @@ class Turtle {
         this.facing = "W";
         break;
       case "WNW":
-        for(var i = 0; i < n/2; i++) {
+        for(let i = 0; i < n/2; i++) {
           this.move("NW",1);
           this.move("W",1);
         }
@@ -189,7 +189,7 @@ class Turtle {
         
       case "NW":
         var pen = this.penDown;
-        for(var i = 0; i < n; i++) {
+        for(let i = 0; i < n; i++) {
           this.penDown = false;
           this.move("N", 1);
           this.penDown = pen;
@@ -198,7 +198,7 @@ class Turtle {
         this.facing = "NW";
         break;
       case "NNW":
-        for(var i = 0; i < n/2; i++) {
+        for(let i = 0; i < n/2; i++) {
           this.move("NW",1);
           this.move("N",1);
         }
@@ -211,7 +211,7 @@ class Turtle {
 function applyRules(t, sentence, fn, n, alphabet) {
   let end = sentence;
   
-  for(var i = 1; i <= n; i++) {
+  for(let i = 1; i <= n; i++) {
     //console.log(end);
     end = fn(end, alphabet);
     if (i == n) {draw(end, t, alphabet);} 
@@ -396,7 +396,7 @@ function draw(s, t, a) {
 
 function weighted_random(items, weights) {
 // https://stackoverflow.com/questions/43566019/how-to-choose-a-weighted-random-array-element-in-javascript
-    var i;
+    let i;
 
     for (i = 0; i < weights.length; i++)
         weights[i] += weights[i - 1] || 0;
@@ -445,7 +445,7 @@ function compute(s) {
   let end = "";
   let stack = [];
   turtle.facing = "N";
-  for(var i = 0; i <= s.length; i++) {
+  for(let i = 0; i <= s.length; i++) {
     let c = s[i];
 
     if(c === 'A') {
