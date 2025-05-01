@@ -17,6 +17,7 @@ import { prodAlphabet } from "./examples/exampleAlphabets";
 
 // Style
 import "./App.css";
+import { DrawControlDispatch } from "./types/DrawControls";
 
 class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError: boolean }> {
   constructor(props) {
@@ -93,7 +94,11 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="container">
-        <DrawControls settings={drawSettings} setFn={setDrawSettings} dispatch={dispatch} />
+        <DrawControls
+          settings={drawSettings}
+          setFn={setDrawSettings}
+          dispatch={dispatch as (action: DrawControlDispatch) => void}
+        />
         <Canvas
           width={drawSettings.width}
           height={drawSettings.height}

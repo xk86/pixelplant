@@ -6,8 +6,12 @@ export interface DrawSettings {
   count: number;
 }
 
+export interface DrawControlDispatch {
+  type: string;
+}
+
 export interface DrawControlProps {
   settings: DrawSettings;
   setFn: (settings: DrawSettings) => void;
-  dispatch: (action: { type: string }) => void;
+  dispatch: (action: DrawControlDispatch) => void;
 }

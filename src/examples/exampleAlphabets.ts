@@ -124,7 +124,7 @@ export const dragonCurveAlphabet = {
   },
 };
 
-export const prodAlphabet = {
+export const prodAlphabet: IAlphabet = {
   //variables: process rule [0], drawing commands and parameters in [1]
   name: "Fern (var. 4)",
   axiom: "Yv",
