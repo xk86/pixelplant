@@ -7,31 +7,38 @@ export function Probs({ state, dispatch }: AppReducerProps) {
   const alphabet = state.alphabet;
   const populateFields = () => {
     let a: ProbEl[] = [];
-    let p = alphabet.probs;
-    for (let r in p) {
-      let newfield: ProbEl = [r, p[r]];
+    const p = alphabet.probs;
+    for (const r in p) {
+      const newfield: ProbEl = [r, p[r]];
       a = [...a, newfield];
     }
     return a;
   };
-  const handleFormChange = (index: number | [number, number], event) => {
-    let data = [...inputFields];
+  const handleFormChange = (
+    index: number | [number, number],
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const data = [...inputFields];
     switch (event.target.name) {
       case "branchRewrite":
-        console.log(808, data[index[0]]);
-      //          data[index[0]][1][index[1]][0] = event.target.value;
-      //          setInputFields(data);
+        console.log("probs-rewrite", data[index[0]]);
+        //          data[index[0]][1][index[1]][0] = event.target.value;
+        //          setInputFields(data);
+        break;
       case "rule":
-        console.log(812, Object.keys(data));
-      //          data[index[0]][event.target.name] = event.target.value;
-      //          setInputFields(data);
+        console.log("probs-rules", Object.keys(data));
+        //          data[index[0]][event.target.name] = event.target.value;
+        //          setInputFields(data);
+        break;
     }
   };
 
   const [inputFields, setInputFields] = React.useState([...populateFields()]);
-  const submit = (e) => {
+  const submit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    for (let i of inputFields) {
+    // i'll be using i later
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    for (const i of inputFields) {
       dispatch({
         type: "replacePRw",
       });
@@ -42,13 +49,13 @@ export function Probs({ state, dispatch }: AppReducerProps) {
     }
   };
   const addFields = () => {
-    let newfield: ProbEl = ["", []];
+    const newfield: ProbEl = ["", []];
     setInputFields([...inputFields, newfield]);
   };
 
   const branches = (bs: ProbTuple[], idx: number) => {
     let a: ProbTuple[] = [];
-    for (let b of bs) {
+    for (const b of bs) {
       a = a.concat([b]);
     }
     return a.map((input, index) => {
