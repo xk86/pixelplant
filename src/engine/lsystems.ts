@@ -1,4 +1,4 @@
-import { Turtle, Color, clamp } from "./turtle";
+import { Turtle, Color } from "./turtle";
 import { IAlphabet } from "../types/Lsystems";
 
 export function applyRules(turtle: Turtle, sentence: string, fn, n: number, alphabet: IAlphabet) {
@@ -14,12 +14,12 @@ export function applyRules(turtle: Turtle, sentence: string, fn, n: number, alph
 }
 export function computeSentence(s, a) {
   let end = "";
-  let va = a.variables;
-  let cn = a.constants;
-  let pr = a.probs;
+  const va = a.variables;
+  const cn = a.constants;
+  const pr = a.probs;
 
   for (let i = 0; i < s.length; i++) {
-    let c = s[i];
+    const c = s[i];
     //  console.log(c)
     if (va[c] != undefined) {
       end += va[c][0];
@@ -42,7 +42,7 @@ export function computeSentence(s, a) {
   return end;
 }
 
-export var drawCommands: [string, number][] = [];
+export const drawCommands: [string, number][] = [];
 
 function draw(s: string, t: Turtle, a: IAlphabet) {
   interface StackFrame {
@@ -51,17 +51,16 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
     facing: string;
     color: Color;
   }
-  let stack: StackFrame[];
-  let va = a.variables;
-  let cn = a.constants;
-  let pr = a.probs;
+  const stack: StackFrame[] = [];
+  const va = a.variables;
+  const cn = a.constants;
+  const pr = a.probs;
   //console.log(a.name);
 
-  let verbs = Turtle.drawOps(t);
+  const verbs = Turtle.drawOps(t);
 
-  stack = [];
   for (let i = 0; i <= s.length; i++) {
-    let c = s[i];
+    const c = s[i];
     if (pr != undefined && pr[c] != undefined) {
       verbs["nop"]();
     } else if (cn[c] != undefined) {
@@ -74,7 +73,7 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
         });
         //        t.color = {r:0,g:127,b:0,a:1};
       } else if (c === "]") {
-        let o = stack.pop();
+        const o = stack.pop();
         if (o !== undefined) {
           t.x = o.x;
           t.y = o.y;
@@ -83,13 +82,13 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
         }
       }
       for (let i = 0; i < cn[c].length; i++) {
-        let [verb, arg] = cn[c][i];
+        const [verb, arg] = cn[c][i];
         verbs[verb](arg);
       }
     } else if (va[c] != undefined) {
       //      console.log(280, va[c])
       for (let i = 0; i < va[c][1].length; i++) {
-        let [verb, arg] = va[c][1][i];
+        const [verb, arg] = va[c][1][i];
         verbs[verb](arg);
       }
     } else {
@@ -100,30 +99,31 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
 
 function weighted_random(items, weights) {
   // https://stackoverflow.com/questions/43566019/how-to-choose-a-weighted-random-array-element-in-javascript
-  let i;
+  let i: number;
 
   for (i = 0; i < weights.length; i++) weights[i] += weights[i - 1] || 0;
 
-  var random = Math.random() * weights[weights.length - 1];
+  const random = Math.random() * weights[weights.length - 1];
 
   for (i = 0; i < weights.length; i++) if (weights[i] > random) break;
 
   return items[i];
 }
 
-const start_y = 256;
-const start_x = start_y;
-
-function drawMany(n, turtle, applyFn, compFn, iters, alphabet) {
-  turtle.x -= 128 * n;
-  for (let i = 1; i <= n; i++) {
-    let cGreen = { r: 90, g: 194, b: 93, a: 0.6 };
-    //   console.log("drawn ", i);
-    turtle.facing = "N";
-    turtle.x += 52 * n + iters * n;
-    turtle.y = start_y;
-    turtle.color = cGreen;
-    //    turtle.shade(0.01)
-    applyFn(turtle, alphabet.axiom, compFn, iters, alphabet);
-  }
-}
+// Unused so far, but I have plans
+//const start_y = 256;
+//const start_x = start_y;
+//
+//function drawMany(n, turtle, applyFn, compFn, iters, alphabet) {
+//  turtle.x -= 128 * n;
+//  for (let i = 1; i <= n; i++) {
+//    const cGreen = { r: 90, g: 194, b: 93, a: 0.6 };
+//    //   console.log("drawn ", i);
+//    turtle.facing = "N";
+//    turtle.x += 52 * n + iters * n;
+//    turtle.y = start_y;
+//    turtle.color = cGreen;
+//    //    turtle.shade(0.01)
+//    applyFn(turtle, alphabet.axiom, compFn, iters, alphabet);
+//  }
+//}
