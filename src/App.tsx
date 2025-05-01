@@ -144,8 +144,7 @@ function App() {
             defined before.
           </li>
           <li>
-            Constant rules are not rewritten (equivalent to a variable with a successor string of
-            "")
+            Constant rules are not rewritten (equivalent to a variable with an empty successor)
           </li>
           <li>There are two special constants: &apos;[&apos; and &apos;]&apos;.</li>
           <li>
