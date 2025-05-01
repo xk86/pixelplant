@@ -18,7 +18,7 @@ export function Axiom({ state, dispatch }: AppReducerProps) {
       type: "axiom",
       payload: { axiom: inputText },
     });
-    dispatch({ type: "reset", payload: { alphabet: state.alphabet } });
+    dispatch({ type: "reset" });
   };
 
   return (

@@ -18,7 +18,7 @@ export function Name({ state, dispatch }: AppReducerProps) {
       type: "name",
       payload: { name: inputText },
     });
-    dispatch({ type: "reset", payload: { alphabet: state.alphabet } });
+    dispatch({ type: "reset" });
   };
 
   return (
