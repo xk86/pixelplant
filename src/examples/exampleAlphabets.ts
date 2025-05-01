@@ -168,6 +168,5 @@ export const prodAlphabet = {
       ["FFFU+++RRRRRcccc[F----F----F----F----F----F]", 0.1],
       ["y", 0.9],
     ],
-  }
-
+  },
 };

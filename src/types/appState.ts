@@ -43,25 +43,26 @@ interface variableAction {
   payload: VarEl;
 }
 interface constantAction {
-  type: 'constant';
+  type: "constant";
   payload: ConstEl;
 }
 
 interface loadAction {
   type: "load";
-  payload: AlphabetState
+  payload: AlphabetState;
 }
 interface resetAction {
   type: "reset";
 }
 
 // Putting it all together...
-export type AllAction = nameAction
-                      | axiomAction
-                      | variableAction
-                      | constantAction
-                      | loadAction
-                      | resetAction;
+export type AllAction =
+  | nameAction
+  | axiomAction
+  | variableAction
+  | constantAction
+  | loadAction
+  | resetAction;
 
 export interface AppReducerState {
   alphabet: IAlphabet;
