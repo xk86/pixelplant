@@ -18,13 +18,8 @@ export const Canvas = (props: CanvasProps) => {
     if (!context) {
       return;
     }
-    context.clearRect(0,0,props.width, props.height);
-    const turtle = new Turtle(
-      props.width / 2,
-      props.height,
-      defaultColor,
-      context
-    );
+    context.clearRect(0, 0, props.width, props.height);
+    const turtle = new Turtle(props.width / 2, props.height, defaultColor, context);
     applyRules(turtle, alphabet.axiom, computeSentence, props.iters, alphabet);
   }, [props.iters, props.state.alphabet]);
 
