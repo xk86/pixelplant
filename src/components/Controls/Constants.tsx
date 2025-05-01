@@ -6,16 +6,15 @@ export function Constants({ state, dispatch }: AppReducerProps) {
   const alphabet = state.alphabet;
   const populateFields = () => {
     let a: ConstEl[] = [];
-    let c = alphabet.constants;
-    for (let r in c) {
-      let newfield: ConstEl = { predecessor: r, drawcmds: c[r] };
+    const c = alphabet.constants;
+    for (const r in c) {
+      const newfield: ConstEl = { predecessor: r, drawcmds: c[r] };
       a = [...a, newfield];
     }
     return a;
   };
   const handleFormChange = (index, event) => {
-    let data = [...inputFields];
-    console.log(event);
+    const data = [...inputFields];
     data[index][event.target.name] = event.target.value;
     dispatch({
       type: "constant",
@@ -26,15 +25,15 @@ export function Constants({ state, dispatch }: AppReducerProps) {
   const [inputFields, setInputFields] = React.useState([...populateFields()]);
   const submit = (e) => {
     e.preventDefault();
-    for (let i of inputFields) {
-      //      dispatch({
-      //        type: "replaceVRw",
-      //        payload: { target: i["rule"], contents: i["rewrite"] },
-      //      });
-    }
+    //    for (let i of inputFields) {
+    //            dispatch({
+    //              type: "replaceVRw",
+    //              payload: { target: i["rule"], contents: i["rewrite"] },
+    //            });
+    //    }
   };
   const addFields = () => {
-    let newfield: ConstEl = { predecessor: "", drawcmds: [] };
+    const newfield: ConstEl = { predecessor: "", drawcmds: [] };
     setInputFields([...inputFields, newfield]);
   };
   const addDraw = (input: ConstEl, index: number) => {
@@ -55,23 +54,26 @@ export function Constants({ state, dispatch }: AppReducerProps) {
                 onChange={(event) => handleFormChange(index, event)}
               />
               {input.drawcmds.map((commandTuple, idx) => {
-                let r = [...input.drawcmds];
-                let fn = (i, e) => {
-                  let v = ([...r][idx][i] = e.target.value);
+                const r = [...input.drawcmds];
+                const fn = (
+                  i: number,
+                  e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>,
+                ) => {
+                  [...r][idx][i] = e.target.value;
                   handleFormChange(index, { ...e, target: { ...e.target, value: r } });
                 };
 
                 return commandTuple[0] === "nop" ? (
                   <select name="drawcmds" value={commandTuple[0]} onChange={(e) => fn(0, e)}>
                     {drawOps.map((x) => (
-                      <option value={x}>{x}</option>
+                      <option key={x}>{x}</option>
                     ))}
                   </select>
                 ) : (
                   <div className="abc">
                     <select name="drawcmds" value={commandTuple[0]} onChange={(e) => fn(0, e)}>
                       {drawOps.map((x) => (
-                        <option value={x}>{x}</option>
+                        <option key={x}>{x}</option>
                       ))}
                     </select>
                     <input
