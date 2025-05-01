@@ -1,9 +1,7 @@
 import React, { ReactNode } from "react";
-import ReactDOM from "react-dom/client";
 
 // Types
 import { CommandTuple, DrawCommandTuples } from "./types/Lsystems";
-import { AppReducerProps } from "./types/AppState";
 
 // Engine
 import { drawOps, opDocs } from "./engine/turtle";
@@ -30,6 +28,7 @@ class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError:
   }
 
   static getDerivedStateFromError(error) {
+    console.log(error);
     return { hasError: true };
   }
 
@@ -46,40 +45,36 @@ class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError:
   }
 }
 
-const curalpha = probAlphabet;
-//controls.render(<Alphabet alphabet={curalpha}/>)
-//drawMany(3, turtle, "y", applyRules, computeSentence, 6, curalpha);
-
-function drawCmdsToString(t: DrawCommandTuples) {
-  let retstr = "";
-  for (let r of t) {
-    retstr += r + "; ";
-  }
-  return retstr;
-}
-
-function drawCmdsFromString(s: string) {
-  for (let c of s) {
-    let cmdStr = "";
-    console.log(c);
-  }
-}
-
-function CommandTupleInput({
-  value,
-  cmds,
-}: {
-  value: CommandTuple;
-  cmds: string[];
-}): React.ReactElement[] {
-  return cmds.map((input, index) => {
-    return input === value[0] ? (
-      <option value={input}>{input}</option>
-    ) : (
-      <option value={input}>{input}</option>
-    );
-  });
-}
+// function drawCmdsToString(t: DrawCommandTuples) {
+//   let retstr = "";
+//   for (let r of t) {
+//     retstr += r + "; ";
+//   }
+//   return retstr;
+// }
+//
+// function drawCmdsFromString(s: string) {
+//   for (let c of s) {
+//     let cmdStr = "";
+//     console.log(c);
+//   }
+// }
+//
+// function CommandTupleInput({
+//   value,
+//   cmds,
+// }: {
+//   value: CommandTuple;
+//   cmds: string[];
+// }): React.ReactElement[] {
+//   return cmds.map((input, index) => {
+//     return input === value[0] ? (
+//       <option value={input}>{input}</option>
+//     ) : (
+//       <option value={input}>{input}</option>
+//     );
+//   });
+// }
 
 function App() {
   //  const [currentAlphabet, setCurrentAlphabet] = React.useState(exampleAlphabet);
@@ -119,12 +114,12 @@ function App() {
         <p>
           The plants are drawn using procedures defined as L-systems, which are a family of
           rewriting rules, specifically made to replicate biological processes like cellular
-          development. Each plant starts as a single sentence, called the "axiom". The characters
-          (letters) in the axiom are replaced recursively (which means the result of the first
-          replacement is used as the start for the next). So, if you have an axiom "
-          {state.alphabet.axiom}", the rewriter will start with the first letter ("
-          {state.alphabet.axiom[0]}"), and replace it with the successor string (found next to that
-          letter in the controls interface), if it has one.
+          development. Each plant starts as a single sentence, called the &quot;axiom&quot;. The
+          characters (letters) in the axiom are replaced recursively (which means the result of the
+          first replacement is used as the start for the next). So, if you have an axiom &quot;
+          {state.alphabet.axiom}&quot;, the rewriter will start with the first letter (&quot;
+          {state.alphabet.axiom[0]}&quot;), and replace it with the successor string (found next to
+          that letter in the controls interface), if it has one.
         </p>
         <p>
           After a certain number of iterations ({drawSettings.iters} right now, see: iters control
@@ -140,7 +135,8 @@ function App() {
             the first, short box in each of the right hand controls.
           </li>
           <li>
-            What happens to the predecessor when it's being read depends on what type of rule it is.
+            What happens to the predecessor when it&quot;s being read depends on what type of rule
+            it is.
           </li>
           <li>
             Variable rules are rewritten by the successor strings (they come after the predecessors
@@ -154,7 +150,7 @@ function App() {
             Constant rules are not rewritten (equivalent to a variable with a successor string of
             "")
           </li>
-          <li>There are two special constants: '[' and ']'.</li>
+          <li>There are two special constants: &apos;[&apos; and &apos;]&apos;.</li>
           <li>
             No matter what you do (short of modifying the code), they will always push and pop the
             current turtle location, direction, and color
@@ -176,17 +172,22 @@ function App() {
 
         <h3>Other things to consider:</h3>
         <ul>
-          <li>Currently can't remove draw commands (just use a nop if you add one by mistake)</li>
-          <li>You also can't move them around</li>
+          <li>
+            Currently can&apos;t remove draw commands (just use a nop if you add one by mistake)
+          </li>
+          <li>You also can&apos;t move them around</li>
           <li>
             Adding new rules and renaming preds is... weird (buggy). If you want to make a
             completely new alphabet, do it from scratch following the object structure and import it
             :)
           </li>
           <li>
-            Object members don't update when settings are imported, though the drawing will change.
+            Object members don&apos;t update when settings are imported, though the drawing will
+            change.
           </li>
-          <li>Some controls don't work, like the Probabilistic controls, or the count option.</li>
+          <li>
+            Some controls don&apos;t work, like the Probabilistic controls, or the count option.
+          </li>
           <li>Some state is wonky and might not get exported properly. Sorry about that :(</li>
           <li>
             Generally just expect bugs. I just wanted to get something kinda working so people can
