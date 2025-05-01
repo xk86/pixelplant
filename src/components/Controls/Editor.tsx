@@ -9,8 +9,8 @@ export function Controls({ state, dispatch }: AppReducerProps) {
   //  console.log(alphabet);
   return (
     <div>
-      <Name alphabet={state.alphabet} dispatch={dispatch} />
-      <Axiom alphabet={state.alphabet} dispatch={dispatch} />
+      <Name state={state} dispatch={dispatch} />
+      <Axiom state={state} dispatch={dispatch} />
       <Variables state={state} dispatch={dispatch} />
       <Constants state={state} dispatch={dispatch} />
       <Probs state={state} dispatch={dispatch} />

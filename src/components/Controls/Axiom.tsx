@@ -1,23 +1,24 @@
 import React from "react";
+import { AppReducerProps } from "../../types/AppState";
 
-export function Axiom(props) {
-  let t = { ...props.alphabet }.axiom;
-  let [inputText, setInputText] = React.useState(t);
+export function Axiom({ state, dispatch }: AppReducerProps) {
+  const t = state.alphabet.axiom;
+  const [inputText, setInputText] = React.useState(t);
   console.log(inputText);
 
   const handleChange = (event) => {
     event.preventDefault();
     console.log(event.target.value);
     setInputText(event.target.value);
-    props.dispatch({ type: "axiom", payload: { axiom: inputText } });
+    dispatch({ type: "axiom", payload: { axiom: inputText } });
   };
   const submit = (e) => {
     e.preventDefault();
-    props.dispatch({
+    dispatch({
       type: "axiom",
       payload: { axiom: inputText },
     });
-    props.dispatch({ type: "reset", payload: { alphabet: props.alphabet } });
+    dispatch({ type: "reset", payload: { alphabet: state.alphabet } });
   };
 
   return (
