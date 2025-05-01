@@ -1,4 +1,4 @@
-import { Turtle, Color, clamp } from "./turtle";
+import {Turtle, Color, clamp} from "./turtle";
 import { IAlphabet } from "../types/Lsystems";
 
 export function applyRules(t, sentence, fn, n, alphabet) {
@@ -42,7 +42,7 @@ export function computeSentence(s, a) {
   return end;
 }
 
-export var drawCommands: [string, number][] = [];
+export var drawCommands:[string, number][] = []
 
 function draw(s: string, t: Turtle, a: IAlphabet) {
   interface StackFrame {
@@ -51,7 +51,7 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
     facing: string;
     color: Color;
   }
-  let stack: StackFrame[];
+  let stack:StackFrame[];
   let va = a.variables;
   let cn = a.constants;
   let pr = a.probs;
@@ -87,7 +87,7 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
         verbs[verb](arg);
       }
     } else if (va[c] != undefined) {
-      //      console.log(280, va[c])
+//      console.log(280, va[c])
       for (let i = 0; i < va[c][1].length; i++) {
         let [verb, arg] = va[c][1][i];
         verbs[verb](arg);
@@ -110,6 +110,7 @@ function weighted_random(items, weights) {
 
   return items[i];
 }
+
 
 function compute() {
   //  let end = "";

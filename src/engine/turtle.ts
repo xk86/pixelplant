@@ -9,7 +9,8 @@ export interface Color {
 export function rgbaStr(color: Color) {
   return `rgba(${color.r},${color.g},${color.b},${color.a})`;
 }
-export const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
+export const clamp = (num: number, min: number, max: number) =>
+  Math.min(Math.max(num, min), max);
 
 export class Turtle {
   x: number;
@@ -18,9 +19,14 @@ export class Turtle {
   ctx: CanvasRenderingContext2D;
   penDown: boolean;
   facing: string;
-  drawOps: { [string]: Function };
+  drawOps: {[string]: Function}
 
-  constructor(x: number, y: number, color: Color, ctx: CanvasRenderingContext2D) {
+  constructor(
+    x: number,
+    y: number,
+    color: Color,
+    ctx: CanvasRenderingContext2D
+  ) {
     this.x = x;
     this.y = y;
     this.color = Object.assign({}, color);
@@ -32,26 +38,26 @@ export class Turtle {
     this.penDown = true;
     this.facing = Turtle.directions[0]; // North
   }
-  static directions = [
-    "N",
-    "NNE",
-    "NE",
-    "ENE",
-    "E",
-    "ESE",
-    "SE",
-    "SSE",
-    "S",
-    "SSW",
-    "SW",
-    "WSW",
-    "W",
-    "WNW",
-    "NW",
-    "NNW",
-  ]; //clockwise starting at N
+    static directions = [
+      "N",
+      "NNE",
+      "NE",
+      "ENE",
+      "E",
+      "ESE",
+      "SE",
+      "SSE",
+      "S",
+      "SSW",
+      "SW",
+      "WSW",
+      "W",
+      "WNW",
+      "NW",
+      "NNW",
+    ]; //clockwise starting at N
   static drawOps(t) {
-    return {
+    return({
       fwd: (steps) => {
         t.moveForward(steps);
       },
@@ -92,9 +98,10 @@ export class Turtle {
       },
       nop: () => {
         t.nop();
-      },
-    };
-  }
+      }
+    }
+    );
+    }
   colorstr() {
     return rgbaStr(this.color);
   }
@@ -289,9 +296,9 @@ export class Turtle {
         break;
     }
   }
-}
+};
 
-export const opDocs = [
+export const opDocs  = [
   "moves forward n",
   "turns clockwise n times",
   "turns counterclockwise n times",
@@ -304,7 +311,7 @@ export const opDocs = [
   "color blue decrease by n",
   "tint (brighten) color by n (kinda broken)",
   "shade (darken) color b n (kinda broken)",
-  "does nothing",
-];
+  "does nothing"
+]
 
 export const drawOps = Object.keys(Turtle.drawOps());
