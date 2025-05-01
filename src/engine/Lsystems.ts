@@ -1,13 +1,19 @@
 import {Turtle, Color, clamp} from "./turtle";
 import { IAlphabet } from "../types/Lsystems";
 
-export function applyRules(t, sentence, fn, n, alphabet) {
+export function applyRules(
+  turtle: Turtle,
+  sentence: string,
+  fn,
+  n: number,
+  alphabet: IAlphabet)
+{
   let end = sentence;
   for (var i = 1; i <= n; i++) {
     //console.log(end);
     end = fn(end, alphabet);
     if (i == n) {
-      draw(end, t, alphabet);
+      draw(end, turtle, alphabet);
     }
   }
   return end;
