@@ -40,8 +40,6 @@ export function computeSentence(sentence: string, alphabet: IAlphabet) {
         items = items.concat(probs[symbol][j][0]);
         probas = probas.concat(probs[symbol][j][1]);
       }
-      console.log(items, probas);
-      //  console.log(items);
       end += weighted_random(items, probas);
     } else {
       end += "";
