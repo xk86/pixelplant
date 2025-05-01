@@ -1,7 +1,13 @@
 import { Turtle, Color } from "./turtle";
-import { IAlphabet } from "../types/Lsystems";
+import { IAlphabet, ApplyRulesFn } from "../types/Lsystems";
 
-export function applyRules(turtle: Turtle, sentence: string, fn, n: number, alphabet: IAlphabet) {
+export function applyRules(
+  turtle: Turtle,
+  sentence: string,
+  fn: ApplyRulesFn,
+  n: number,
+  alphabet: IAlphabet,
+): string {
   let end = sentence;
   for (let i = 1; i <= n; i++) {
     //console.log(end);
@@ -12,29 +18,31 @@ export function applyRules(turtle: Turtle, sentence: string, fn, n: number, alph
   }
   return end;
 }
-export function computeSentence(s, a) {
+
+export function computeSentence(sentence: string, alphabet: IAlphabet) {
   let end = "";
-  const va = a.variables;
-  const cn = a.constants;
-  const pr = a.probs;
+  const variables = alphabet.variables;
+  const constants = alphabet.constants;
+  const probs = alphabet.probs;
 
-  for (let i = 0; i < s.length; i++) {
-    const c = s[i];
+  for (let i = 0; i < sentence.length; i++) {
+    const symbol = sentence[i];
     //  console.log(c)
-    if (va[c] != undefined) {
-      end += va[c][0];
-    } else if (cn[c] != undefined) {
-      end += c;
-    } else if (pr != undefined && pr[c] != undefined) {
-      let items = [];
-      let probs = [];
+    if (variables[symbol] != undefined) {
+      end += variables[symbol][0];
+    } else if (constants[symbol] != undefined) {
+      end += symbol;
+    } else if (probs != undefined && probs[symbol] != undefined) {
+      let items: string[] = [];
+      let probas: number[] = [];
 
-      for (let j = 0; j < pr[c].length; j++) {
-        items = items.concat(pr[c][j][0]);
-        probs = probs.concat(pr[c][j][1]);
+      for (let j = 0; j < probs[symbol].length; j++) {
+        items = items.concat(probs[symbol][j][0]);
+        probas = probas.concat(probs[symbol][j][1]);
       }
+      console.log(items, probas);
       //  console.log(items);
-      end += weighted_random(items, probs);
+      end += weighted_random(items, probas);
     } else {
       end += "";
     }
@@ -44,7 +52,7 @@ export function computeSentence(s, a) {
 
 export const drawCommands: [string, number][] = [];
 
-function draw(s: string, t: Turtle, a: IAlphabet) {
+function draw(sentence: string, turtle: Turtle, alphabet: IAlphabet) {
   interface StackFrame {
     x: number;
     y: number;
@@ -52,43 +60,43 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
     color: Color;
   }
   const stack: StackFrame[] = [];
-  const va = a.variables;
-  const cn = a.constants;
-  const pr = a.probs;
+  const variables = alphabet.variables;
+  const constants = alphabet.constants;
+  const probs = alphabet.probs;
   //console.log(a.name);
 
-  const verbs = Turtle.drawOps(t);
+  const verbs = Turtle.drawOps(turtle);
 
-  for (let i = 0; i <= s.length; i++) {
-    const c = s[i];
-    if (pr != undefined && pr[c] != undefined) {
+  for (let i = 0; i <= sentence.length; i++) {
+    const symbol = sentence[i];
+    if (probs != undefined && probs[symbol] != undefined) {
       verbs["nop"]();
-    } else if (cn[c] != undefined) {
-      if (c === "[") {
+    } else if (constants[symbol] != undefined) {
+      if (symbol === "[") {
         stack.push({
-          x: t.x,
-          y: t.y,
-          facing: t.facing,
-          color: Object.assign({}, t.color),
+          x: turtle.x,
+          y: turtle.y,
+          facing: turtle.facing,
+          color: Object.assign({}, turtle.color),
         });
         //        t.color = {r:0,g:127,b:0,a:1};
-      } else if (c === "]") {
+      } else if (symbol === "]") {
         const o = stack.pop();
         if (o !== undefined) {
-          t.x = o.x;
-          t.y = o.y;
-          t.facing = o.facing;
-          t.color = o.color;
+          turtle.x = o.x;
+          turtle.y = o.y;
+          turtle.facing = o.facing;
+          turtle.color = o.color;
         }
       }
-      for (let i = 0; i < cn[c].length; i++) {
-        const [verb, arg] = cn[c][i];
+      for (let i = 0; i < constants[symbol].length; i++) {
+        const [verb, arg] = constants[symbol][i];
         verbs[verb](arg);
       }
-    } else if (va[c] != undefined) {
+    } else if (variables[symbol] != undefined) {
       //      console.log(280, va[c])
-      for (let i = 0; i < va[c][1].length; i++) {
-        const [verb, arg] = va[c][1][i];
+      for (let i = 0; i < variables[symbol][1].length; i++) {
+        const [verb, arg] = variables[symbol][1][i];
         verbs[verb](arg);
       }
     } else {
@@ -97,7 +105,7 @@ function draw(s: string, t: Turtle, a: IAlphabet) {
   }
 }
 
-function weighted_random(items, weights) {
+function weighted_random(items: unknown[], weights: number[]) {
   // https://stackoverflow.com/questions/43566019/how-to-choose-a-weighted-random-array-element-in-javascript
   let i: number;
 

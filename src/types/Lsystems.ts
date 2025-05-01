@@ -12,3 +12,6 @@ export interface IAlphabet {
   constants: Constant;
   probs?: Prob;
 }
+export interface ApplyRulesFn {
+  (sentence: string, alphabet: IAlphabet): string;
+}
