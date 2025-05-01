@@ -17,7 +17,7 @@ export class Turtle {
   ctx: CanvasRenderingContext2D;
   penDown: boolean;
   facing: string;
-  drawOps: { [string]: Function };
+  drawOps: { [key: string]: (arg: number) => void } = {};
 
   constructor(x: number, y: number, color: Color, ctx: CanvasRenderingContext2D) {
     this.x = x;
@@ -49,6 +49,23 @@ export class Turtle {
     "NW",
     "NNW",
   ]; //clockwise starting at N
+
+  static drawOpNames = {
+    fwd: "moves forward n",
+    tcw: "turns clockwise n times",
+    tcc: "turns counterclockwise n times",
+    tup: "faces turtle up and moves n",
+    "cr+": "color red increase by n",
+    "cr-": "color red decrease by n",
+    "cg+": "color green increase by n",
+    "cg-": "color green decrease by n",
+    "cb+": "color blue increase by n",
+    "cb-": "color blue decrease by n",
+    tnt: "tint (brighten) color by n (kinda broken)",
+    shd: "shade (darken) color b n (kinda broken)",
+    nop: "does nothing",
+  };
+
   static drawOps(t: Turtle) {
     return {
       fwd: (steps: number) => {
@@ -94,6 +111,7 @@ export class Turtle {
       },
     };
   }
+
   colorstr() {
     return rgbaStr(this.color);
   }
@@ -287,20 +305,6 @@ export class Turtle {
   }
 }
 
-export const opDocs = [
-  "moves forward n",
-  "turns clockwise n times",
-  "turns counterclockwise n times",
-  "faces turtle up and moves n",
-  "color red increase by n",
-  "color red decrease by n",
-  "color green increase by n",
-  "color green decrease byn",
-  "color blue increase by n",
-  "color blue decrease by n",
-  "tint (brighten) color by n (kinda broken)",
-  "shade (darken) color b n (kinda broken)",
-  "does nothing",
-];
+export const opDocs = Object.values(Turtle.drawOpNames);
 
-export const drawOps = Object.keys(Turtle.drawOps());
+export const drawOps = Object.keys(Turtle.drawOpNames);
