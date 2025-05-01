@@ -3,6 +3,7 @@ import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
+import globalIgnores from "eslint/config";
 
 export default [
   ...tseslint.config(eslint.configs.recommended, tseslint.configs.recommended),
@@ -15,4 +16,5 @@ export default [
       "react-hooks": reactHooks,
     },
   },
+  globalIgnores.globalIgnores(["node_modules/", "dist/"]),
 ];
