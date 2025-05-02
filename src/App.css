@@ -2,14 +2,28 @@ body {
   display: flex;
 }
 
-.container {
-  display: inline-flex;
-  width: 75%;
+#root {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.canvas-container {
+  display: flex;
+  width: 75vh;
+  flex-direction: column;
 }
 
 .varItems {
   display: inline-flex;
   flex-wrap: nowrap;
+}
+
+.controls-container {
+}
+
+.container-container {
+  display: flex;
 }
 
 input[name="predecessor"] {

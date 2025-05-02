@@ -62,21 +62,25 @@ function App() {
   console.log(drawOps);
   return (
     <ErrorBoundary>
-      <div className="container">
-        <DrawControls
-          settings={drawSettings}
-          setFn={setDrawSettings}
-          dispatch={dispatch as (action: DrawControlDispatch) => void}
-        />
-        <Canvas
-          width={drawSettings.width}
-          height={drawSettings.height}
-          scale={drawSettings.scale}
-          iters={drawSettings.iters}
-          state={state}
-        />
-        <Controls state={state} dispatch={dispatch} />
-        <ImpExport state={state} dispatch={dispatch} />
+      <div className="container-container">
+        <div className="canvas-container">
+          <Canvas
+            width={drawSettings.width}
+            height={drawSettings.height}
+            scale={drawSettings.scale}
+            iters={drawSettings.iters}
+            state={state}
+          />
+        </div>
+        <div className="controls-container">
+          <Controls state={state} dispatch={dispatch} />
+          <DrawControls
+            settings={drawSettings}
+            setFn={setDrawSettings}
+            dispatch={dispatch as (action: DrawControlDispatch) => void}
+          />
+          <ImpExport state={state} dispatch={dispatch} />
+        </div>
       </div>
       <div className="documentation">
         <h1>Documentation</h1>
