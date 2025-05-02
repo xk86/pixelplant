@@ -3,14 +3,13 @@ body {
 }
 
 #root {
-  display: flex;
-  flex-direction: column;
   position: relative;
 }
 
 .canvas-container {
-  display: flex;
-  width: 75vh;
+  flex-shrink: 0;
+  top: 0;
+  position: sticky;
   flex-direction: column;
 }
 
@@ -24,6 +23,15 @@ body {
 
 .container-container {
   display: flex;
+  align-items: flex-start;
+}
+@media (max-width: 1024px) {
+  .container-container {
+    flex-direction: column;
+  }
+  .canvas-container {
+    position: relative;
+  }
 }
 
 input[name="predecessor"] {
