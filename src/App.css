@@ -1,3 +1,7 @@
+body {
+  display: flex;
+}
+
 .container {
   display: inline-flex;
   width: 75%;
@@ -20,4 +24,10 @@ canvas {
   image-rendering: optimize-contrast;
   image-rendering: pixelated;
   -ms-interpolation-mode: nearest-neighbor;
+}
+
+.documentation {
+  max-width: 80ch;
+  padding: 0.69em;
+  margin: auto;
 }
