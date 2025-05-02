@@ -43,37 +43,6 @@ class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError:
   }
 }
 
-// function drawCmdsToString(t: DrawCommandTuples) {
-//   let retstr = "";
-//   for (let r of t) {
-//     retstr += r + "; ";
-//   }
-//   return retstr;
-// }
-//
-// function drawCmdsFromString(s: string) {
-//   for (let c of s) {
-//     let cmdStr = "";
-//     console.log(c);
-//   }
-// }
-//
-// function CommandTupleInput({
-//   value,
-//   cmds,
-// }: {
-//   value: CommandTuple;
-//   cmds: string[];
-// }): React.ReactElement[] {
-//   return cmds.map((input, index) => {
-//     return input === value[0] ? (
-//       <option value={input}>{input}</option>
-//     ) : (
-//       <option value={input}>{input}</option>
-//     );
-//   });
-// }
-
 function App() {
   //  const [currentAlphabet, setCurrentAlphabet] = React.useState(exampleAlphabet);
   const [state, dispatch] = React.useReducer(
